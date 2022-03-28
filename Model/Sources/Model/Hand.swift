@@ -33,6 +33,35 @@ public final class Hand: ObservableObject {
         }
     }
     
+    public func getSuits(for card: Card) -> Set<Suit> {
+        configuration.allowsRainbows
+        ? getSuitsWithRainbows(for: card)
+        : getSuitsWithoutRainbows(for: card)
+    }
+    
+    private func getSuitsWithRainbows(for card: Card) -> Set<Suit> {
+        if card.hintableSuits.count == 1,
+            card.hintedSuits.isEmpty {
+            return card.hintableSuits
+        } else {
+            return card.hintedSuits
+        }
+    }
+    
+    private func getSuitsWithoutRainbows(for card: Card) -> Set<Suit> {
+        switch card.hintedSuits.count {
+        case 1: return card.hintedSuits
+        default: break
+        }
+        
+        switch card.hintableSuits.count {
+        case 1: return card.hintableSuits
+        default: break
+        }
+        
+        return []
+    }
+    
     public func getHintableSuits(for card: Card) -> Set<Suit> {
         configuration.allowsRainbows
             ? getHintableSuitsWithRainbows(for: card)
