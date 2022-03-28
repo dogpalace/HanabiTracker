@@ -44,6 +44,7 @@
 		F4F9ADF127EFD500002D1CBD /* HanabiTrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HanabiTrackerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4F9ADF527EFD500002D1CBD /* HanabiTrackerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HanabiTrackerUITests.swift; sourceTree = "<group>"; };
 		F4F9ADF727EFD500002D1CBD /* HanabiTrackerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HanabiTrackerUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		F4F9AE0427EFD549002D1CBD /* Model */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Model; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +75,7 @@
 		F4F9ADCE27EFD4FE002D1CBD = {
 			isa = PBXGroup;
 			children = (
+				F4F9AE0427EFD549002D1CBD /* Model */,
 				F4F9ADD927EFD4FE002D1CBD /* HanabiTracker */,
 				F4F9ADEA27EFD500002D1CBD /* HanabiTrackerTests */,
 				F4F9ADF427EFD500002D1CBD /* HanabiTrackerUITests */,
