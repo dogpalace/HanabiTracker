@@ -45,64 +45,65 @@ class HandTests: XCTestCase {
         XCTAssertEqual(count, 5, .hasFiveCards)
     }
 
-    func testPossibleSuitsWithoutRainbowsForUnsuitedCard() async throws {
+    func testHintableSuitsWithoutRainbowsForUnsuitedCard() async throws {
         await useHand(withRainbows: false)
         let card = await getFirstCard()
-        let possibleSuits = await hand.getPossibleSuits(for: card)
+        let hintableSuits = await hand.getHintableSuits(for: card)
         
         XCTAssertEqual(
-            possibleSuits,
+            hintableSuits,
             Set(Suit.allCases),
-            .WithoutRainbows.possibleSuitsForUnsuitedCard
+            .WithoutRainbows.hintableSuitsForUnsuitedCard
         )
     }
     
-    func testPossibleSuitsWithoutRainbowsForSuitedCard() async throws {
+    func testHintableSuitsWithoutRainbowsForSuitedCard() async throws {
         await useHand(withRainbows: false)
         let card = await getFirstCard()
         card.setSuits([.green])
-        let possibleSuits = await hand.getPossibleSuits(for: card)
+        let hintableSuits = await hand.getHintableSuits(for: card)
                 
-        XCTAssertTrue(
-            possibleSuits.isEmpty,
-            .WithoutRainbows.possibleSuitsForSingleSuitedCard
+        XCTAssertEqual(
+            hintableSuits,
+            [],
+            .WithoutRainbows.hintableSuitsForSingleSuitedCard
         )
     }
     
-    func testPossibleSuitsWithRainbowsForUnsuitedCard() async {
+    func testHintableSuitsWithRainbowsForUnsuitedCard() async {
         await useHand(withRainbows: true)
         let card = await getFirstCard()
-        let possibleSuits = await hand.getPossibleSuits(for: card)
+        let hintableSuits = await hand.getHintableSuits(for: card)
         
         XCTAssertEqual(
-            possibleSuits,
+            hintableSuits,
             Set(Suit.allCases),
-            .WithRainbows.possibleSuitsForUnsuitedCard
+            .WithRainbows.hintableSuitsForUnsuitedCard
         )
     }
 
-    func testPossibleSuitsWithRainbowsForSuitedCard() async {
+    func testHintableSuitsWithRainbowsForSuitedCard() async {
         await useHand(withRainbows: true)
         let card = await getFirstCard()
         card.setSuits([.green])
-        let possibleSuits = await hand.getPossibleSuits(for: card)
+        let hintableSuits = await hand.getHintableSuits(for: card)
         
         XCTAssertEqual(
-            possibleSuits,
+            hintableSuits,
             [.yellow, .red, .white, .blue],
-            .WithRainbows.possibleSuitsForSingleSuitedCard
+            .WithRainbows.hintableSuitsForSingleSuitedCard
         )
     }
     
-    func testPossibleSuitsWithRainbowsForMultiSuitedCard() async {
+    func testHintableSuitsWithRainbowsForMultiSuitedCard() async {
         await useHand(withRainbows: true)
         let card = await getFirstCard()
         card.setSuits([.green, .blue])
-        let possibleSuits = await hand.getPossibleSuits(for: card)
+        let hintableSuits = await hand.getHintableSuits(for: card)
         
         XCTAssertTrue(
-            possibleSuits.isEmpty,
-            .WithRainbows.possibleSuitsForMultiSuitedCard
+            hintableSuits.isEmpty,
+            .WithRainbows.hintableSuitsForMultiSuitedCard
         )
     }
     
@@ -114,9 +115,9 @@ class HandTests: XCTestCase {
         await hand.applyHint(.suit(.red), to: startCards)
         
         for card in startCards {
-            let possibleSuits = await hand.getPossibleSuits(for: card)
+            let hintableSuits = await hand.getHintableSuits(for: card)
             XCTAssertTrue(
-                possibleSuits.isEmpty,
+                hintableSuits.isEmpty,
                 .WithoutRainbows.applyingSuitHint
             )
         }
@@ -124,9 +125,9 @@ class HandTests: XCTestCase {
         let endCards = await Array(hand.cards[2 ... 3])
         
         for card in endCards {
-            let possibleSuits = await hand.getPossibleSuits(for: card)
+            let hintableSuits = await hand.getHintableSuits(for: card)
             XCTAssertEqual(
-                possibleSuits,
+                hintableSuits,
                 Set(Suit.allCases).subtracting([.red]),
                 .WithoutRainbows.applyingSuitHint
             )
@@ -147,47 +148,47 @@ class HandTests: XCTestCase {
         let startingCards = await Array(hand.cards[0 ..< 3])
         
         for card in startingCards {
-            let possibleSuits = await hand.getPossibleSuits(for: card)
+            let hintableSuits = await hand.getHintableSuits(for: card)
             XCTAssertEqual(
-                possibleSuits,
+                hintableSuits,
                 Set(Suit.allCases).subtracting([.red]),
                 .WithRainbows.applyingSuitHint
             )
         }
         
-        let possibleSuits = await hand.getPossibleSuits(for: lastCard)
+        let hintableSuits = await hand.getHintableSuits(for: lastCard)
         XCTAssertEqual(
-            possibleSuits,
+            hintableSuits,
             Set(Suit.allCases).subtracting([.red, .green]),
             .WithRainbows.applyingSuitHint
         )
     }
     
-    func testPossibleValuesForValuedCard() async {
+    func testHintableValuesForValuedCard() async {
         await useHand(withRainbows: true)
         let firstCard = await hand.cards.first!
         
         firstCard.setValue(.four)
-        let possibleValues = await hand.getPossibleValues(for: firstCard)
+        let hintableValues = await hand.getHintableValues(for: firstCard)
         
         XCTAssertTrue(
-            possibleValues.isEmpty,
-            .possibleValuesForValuedCard
+            hintableValues.isEmpty,
+            .hintableValuesForValuedCard
         )
     }
     
-    func testPossibleValuesForCardWithNarrowedValues() async {
+    func testHintableValuesForCardWithNarrowedValues() async {
         await useHand(withRainbows: true)
         let firstCard = await hand.cards.first!
-        firstCard.removeOutstandingValue(.one)
-        firstCard.removeOutstandingValue(.three)
+        firstCard.removeHintableValue(.one)
+        firstCard.removeHintableValue(.three)
 
-        let possibleValues = await hand.getPossibleValues(for: firstCard)
+        let hintableValues = await hand.getHintableValues(for: firstCard)
 
         XCTAssertEqual(
-            possibleValues,
+            hintableValues,
             Set(Value.allCases).subtracting([.three, .one]),
-            .possibleValuesForNarrowedValueCard
+            .hintableValuesForNarrowedValueCard
         )
     }
     
@@ -198,26 +199,24 @@ class HandTests: XCTestCase {
 
         await hand.applyHint(.value(.five), to: [firstCard])
 
-        // first card will have possible value of five
-        // other cards will have possible values of one through four
         XCTAssertEqual(
             firstCard.value,
             .five,
             .applyingValueHint
         )
 
-        let possibleValues = await hand.getPossibleValues(for: firstCard)
+        let hintableValues = await hand.getHintableValues(for: firstCard)
         XCTAssertTrue(
-            possibleValues.isEmpty,
-            .possibleValuesForValuedCard
+            hintableValues.isEmpty,
+            .hintableValuesForValuedCard
         )
 
         for card in remainingCards {
-            let possibleValues = await hand.getPossibleValues(for: card)
+            let hintableValues = await hand.getHintableValues(for: card)
             XCTAssertEqual(
-                possibleValues,
+                hintableValues,
                 Set(Value.allCases).subtracting([.five]),
-                .valueHintNarrowsPossibleValues
+                .valueHintNarrowsHintableValues
             )
         }
     }
@@ -246,21 +245,21 @@ fileprivate extension String {
     static let hasSize = "A hand has a size"
     static let hasFourCards = "A hand can have four cards"
     static let hasFiveCards = "A hand can have five cards"
-    static let possibleValuesForValuedCard = "A card hinted with a value has that value and no other possible values"
-    static let possibleValuesForNarrowedValueCard = "A card with narrowed outstanding values should only have those as possible values"
+    static let hintableValuesForValuedCard = "A card hinted with a value has that value and no other hintable values"
+    static let hintableValuesForNarrowedValueCard = "A card with narrowed outstanding values should only have those as hintable values"
     static let applyingValueHint = "A card hinted with a value should have that value"
-    static let valueHintNarrowsPossibleValues = "A value hint should narrow the possible values for cards not part of the hint"
+    static let valueHintNarrowsHintableValues = "A value hint should narrow the hintable values for cards not part of the hint"
     
     enum WithoutRainbows {
-        static let possibleSuitsForUnsuitedCard = "An unsuited card can be any suit"
-        static let possibleSuitsForSingleSuitedCard = "A single suited card has no possible suits"
-        static let applyingSuitHint = "Applying a suit hint should eliminate other possible suits"
+        static let hintableSuitsForUnsuitedCard = "An unsuited card can be any suit"
+        static let hintableSuitsForSingleSuitedCard = "A single suited card has one hintable suit"
+        static let applyingSuitHint = "Applying a suit hint should eliminate other hintable suits"
     }
     
     enum WithRainbows {
-        static let possibleSuitsForUnsuitedCard = "An unsuited card can be any suit"
-        static let possibleSuitsForSingleSuitedCard = "A single suited card has four possible suits"
-        static let possibleSuitsForMultiSuitedCard = "A multi-suited card has no possible suits"
+        static let hintableSuitsForUnsuitedCard = "An unsuited card can be any suit"
+        static let hintableSuitsForSingleSuitedCard = "A single suited card has four hintable suits"
+        static let hintableSuitsForMultiSuitedCard = "A multi-suited card has no hintable suits"
         static let applyingSuitHint = "Applying a suit hint should set the suit for applicable cards and eliminate the suit for others"
     }
 }

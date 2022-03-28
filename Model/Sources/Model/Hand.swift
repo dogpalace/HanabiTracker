@@ -27,21 +27,20 @@ public final class Hand: ObservableObject {
         self.configuration = configuration
         self.size = size
         
-//        cards = Array(repeating: Card(), count: size.rawValue)
         cards = []
         (0 ..< self.size.rawValue).forEach { _ in
             cards.append(Card())
         }
     }
     
-    public func getPossibleSuits(for card: Card) -> Set<Suit> {
+    public func getHintableSuits(for card: Card) -> Set<Suit> {
         configuration.allowsRainbows
-            ? getPossibleSuitsWithRainbows(for: card)
-            : getPossibleSuitsWithoutRainbows(for: card)
+            ? getHintableSuitsWithRainbows(for: card)
+            : getHintableSuitsWithoutRainbows(for: card)
     }
     
-    public func getPossibleValues(for card: Card) -> Set<Value> {
-        card.value == nil ? card.outstandingValues : []
+    public func getHintableValues(for card: Card) -> Set<Value> {
+        card.value == nil ? card.hintableValues : []
     }
     
     public func applyHint(_ hint: Hint, to hintedCards: [Card]) async {
@@ -50,33 +49,33 @@ public final class Hand: ObservableObject {
         switch hint {
         case let .value(value):
             hintedCards.forEach { $0.setValue(value) }
-            otherCards.forEach { $0.removeOutstandingValue(value) }
+            otherCards.forEach { $0.removeHintableValue(value) }
             
         case let .suit(suit):
-            hintedCards.forEach { $0.setSuits($0.suits.union([suit])) }
-            otherCards.forEach { $0.removeOutstandingSuit(suit) }
+            hintedCards.forEach { $0.setSuits($0.hintedSuits.union([suit])) }
+            otherCards.forEach { $0.removeHintableSuit(suit) }
         }
     }
     
-    private func getPossibleSuitsWithoutRainbows(
+    private func getHintableSuitsWithoutRainbows(
         for card: Card
     ) -> Set<Suit> {
-        card.suits.isEmpty
-            ? Set(Suit.allCases).intersection(card.outstandingSuits)
-            : []
+        card.hintedSuits.isEmpty
+            ? Set(Suit.allCases).intersection(card.hintableSuits)
+        : []
     }
     
-    private func getPossibleSuitsWithRainbows(
+    private func getHintableSuitsWithRainbows(
         for card: Card
     ) -> Set<Suit> {
-        switch card.suits.count {
+        switch card.hintedSuits.count {
         case 0:
-            return Set(Suit.allCases).intersection(card.outstandingSuits)
+            return Set(Suit.allCases).intersection(card.hintableSuits)
             
         case 1:
             return Set(Suit.allCases)
-                .subtracting(card.suits)
-                .intersection(card.outstandingSuits)
+                .subtracting(card.hintedSuits)
+                .intersection(card.hintableSuits)
             
         default:
             return []
