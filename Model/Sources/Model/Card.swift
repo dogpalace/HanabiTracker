@@ -2,11 +2,24 @@ import Foundation
 import SwiftUI
 
 public class Card: ObservableObject, Equatable, Hashable {
-    @Published var hintedSuits = Set<Suit>()
-    @Published var hintableSuits = Set(Suit.allCases)
-    @Published var value: Value?
-    @Published var hintableValues = Set(Value.allCases)
+    @Published public var hintedSuits = Set<Suit>()
+    @Published public var hintableSuits = Set(Suit.allCases)
+    @Published public var value: Value?
+    @Published public var hintableValues = Set(Value.allCases)
 
+    // To make it easy to preview
+    public init(
+        hintedSuits: Set<Suit> = [],
+        hintableSuits: Set<Suit> = Set(Suit.allCases),
+        value: Value? = nil,
+        hintableValues: Set<Value> = Set(Value.allCases)
+    ) {
+        self.hintedSuits = hintedSuits
+        self.hintableSuits = hintableSuits
+        self.value = value
+        self.hintableValues = hintableValues
+    }
+    
     func setSuits(_ suits: Set<Suit>) {
         self.hintedSuits = suits
         
@@ -31,6 +44,7 @@ public class Card: ObservableObject, Equatable, Hashable {
         hasher.combine(hintedSuits.hashValue)
         hasher.combine(hintableSuits.hashValue)
         hasher.combine(value?.hashValue)
+        hasher.combine(ObjectIdentifier(self))
     }
     
     public static func == (lhs: Card, rhs: Card) -> Bool {

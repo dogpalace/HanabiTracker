@@ -1,6 +1,5 @@
 import Foundation
 
-@MainActor
 public final class Hand: ObservableObject {
     
     public enum Size: Int {
@@ -17,7 +16,7 @@ public final class Hand: ObservableObject {
     }
 
     @Published public var cards: [Card]
-    let configuration: Configuration
+    public let configuration: Configuration
     let size: Size
     
     public init(
@@ -72,17 +71,44 @@ public final class Hand: ObservableObject {
         card.value == nil ? card.hintableValues : []
     }
     
-    public func applyHint(_ hint: Hint, to hintedCards: [Card]) async {
+    public func applyHint(_ hint: Hint, to hintedCards: [Card]) {
         let otherCards = Set(self.cards).subtracting(Set(hintedCards))
         
         switch hint {
+        case let .suit(suit):
+            if configuration.allowsRainbows {
+                applySuitHintWithRainbows(suit: suit, cards: hintedCards)
+            } else {
+                applySuitHintWithoutRainbows(suit: suit, cards: hintedCards)
+            }
+            otherCards.forEach { $0.removeHintableSuit(suit) }
+
         case let .value(value):
             hintedCards.forEach { $0.setValue(value) }
             otherCards.forEach { $0.removeHintableValue(value) }
+        }
+    }
+    
+    public func dismiss(_ card: Card) {
+        guard let cardPosition = cards.firstIndex(of: card) else { return }
+        
+        cards.remove(at: cardPosition)
+        cards.append(Card())
+    }
+    
+    private func applySuitHintWithRainbows(suit: Suit, cards: [Card]) {
+        cards.forEach { card in
+            guard card.hintedSuits.count < 2 else { return }
             
-        case let .suit(suit):
-            hintedCards.forEach { $0.setSuits($0.hintedSuits.union([suit])) }
-            otherCards.forEach { $0.removeHintableSuit(suit) }
+            card.setSuits(card.hintedSuits.union([suit]))
+        }
+    }
+    
+    private func applySuitHintWithoutRainbows(suit: Suit, cards: [Card]) {
+        cards.forEach { card in
+            guard card.hintedSuits.count < 1 else { return }
+            
+            card.setSuits([suit])
         }
     }
     

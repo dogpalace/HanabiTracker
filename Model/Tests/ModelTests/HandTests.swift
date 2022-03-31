@@ -12,10 +12,10 @@ class HandTests: XCTestCase {
         super.tearDown()
     }
 
-    func testHasConfiguration() async {
-        await useHand(withRainbows: false)
+    func testHasConfiguration() {
+        useHand(withRainbows: false)
         
-        let configurationAllowsRainbows = await hand.configuration.allowsRainbows
+        let configurationAllowsRainbows = hand.configuration.allowsRainbows
         XCTAssertEqual(
             configurationAllowsRainbows,
             allowsRainbows,
@@ -23,32 +23,32 @@ class HandTests: XCTestCase {
         )
     }
     
-    func testHasSize() async {
-        await useHand(withRainbows: false)
-        let size = await hand.size
+    func testHasSize() {
+        useHand(withRainbows: false)
+        let size = hand.size
         XCTAssertEqual(size, .four, .hasSize)
     }
     
-    func testFourCards() async {
-        await useHand(withRainbows: false)
-        let count = await hand.cards.count
+    func testFourCards() {
+        useHand(withRainbows: false)
+        let count = hand.cards.count
         XCTAssertEqual(count, 4, .hasFourCards)
     }
     
-    func testFiveCards() async {
-        hand = await Hand(
+    func testFiveCards() {
+        hand = Hand(
             configuration: .init(allowsRainbows: false),
             size: .five
         )
-        let count = await hand.cards.count
+        let count = hand.cards.count
         
         XCTAssertEqual(count, 5, .hasFiveCards)
     }
 
-    func testHintableSuitsWithoutRainbowsForUnsuitedCard() async throws {
-        await useHand(withRainbows: false)
-        let card = await getFirstCard()
-        let hintableSuits = await hand.getHintableSuits(for: card)
+    func testHintableSuitsWithoutRainbowsForUnsuitedCard() throws {
+        useHand(withRainbows: false)
+        let card = getFirstCard()
+        let hintableSuits = hand.getHintableSuits(for: card)
         
         XCTAssertEqual(
             hintableSuits,
@@ -57,11 +57,11 @@ class HandTests: XCTestCase {
         )
     }
     
-    func testHintableSuitsWithoutRainbowsForSuitedCard() async throws {
-        await useHand(withRainbows: false)
-        let card = await getFirstCard()
+    func testHintableSuitsWithoutRainbowsForSuitedCard() throws {
+        useHand(withRainbows: false)
+        let card = getFirstCard()
         card.setSuits([.green])
-        let hintableSuits = await hand.getHintableSuits(for: card)
+        let hintableSuits = hand.getHintableSuits(for: card)
                 
         XCTAssertEqual(
             hintableSuits,
@@ -70,10 +70,10 @@ class HandTests: XCTestCase {
         )
     }
     
-    func testHintableSuitsWithRainbowsForUnsuitedCard() async {
-        await useHand(withRainbows: true)
-        let card = await getFirstCard()
-        let hintableSuits = await hand.getHintableSuits(for: card)
+    func testHintableSuitsWithRainbowsForUnsuitedCard() {
+        useHand(withRainbows: true)
+        let card = getFirstCard()
+        let hintableSuits = hand.getHintableSuits(for: card)
         
         XCTAssertEqual(
             hintableSuits,
@@ -82,11 +82,11 @@ class HandTests: XCTestCase {
         )
     }
 
-    func testHintableSuitsWithRainbowsForSuitedCard() async {
-        await useHand(withRainbows: true)
-        let card = await getFirstCard()
+    func testHintableSuitsWithRainbowsForSuitedCard() {
+        useHand(withRainbows: true)
+        let card = getFirstCard()
         card.setSuits([.green])
-        let hintableSuits = await hand.getHintableSuits(for: card)
+        let hintableSuits = hand.getHintableSuits(for: card)
         
         XCTAssertEqual(
             hintableSuits,
@@ -95,11 +95,11 @@ class HandTests: XCTestCase {
         )
     }
     
-    func testHintableSuitsWithRainbowsForMultiSuitedCard() async {
-        await useHand(withRainbows: true)
-        let card = await getFirstCard()
+    func testHintableSuitsWithRainbowsForMultiSuitedCard() {
+        useHand(withRainbows: true)
+        let card = getFirstCard()
         card.setSuits([.green, .blue])
-        let hintableSuits = await hand.getHintableSuits(for: card)
+        let hintableSuits = hand.getHintableSuits(for: card)
         
         XCTAssertTrue(
             hintableSuits.isEmpty,
@@ -107,25 +107,25 @@ class HandTests: XCTestCase {
         )
     }
     
-    func testApplyingSuitHintWithoutRainbows() async {
-        await useHand(withRainbows: false)
+    func testApplyingSuitHintWithoutRainbows() {
+        useHand(withRainbows: false)
         
-        let startCards = await Array(hand.cards[0 ... 1])
+        let startCards = Array(hand.cards[0 ... 1])
         
-        await hand.applyHint(.suit(.red), to: startCards)
+        hand.applyHint(.suit(.red), to: startCards)
         
         for card in startCards {
-            let hintableSuits = await hand.getHintableSuits(for: card)
+            let hintableSuits = hand.getHintableSuits(for: card)
             XCTAssertTrue(
                 hintableSuits.isEmpty,
                 .WithoutRainbows.applyingSuitHint
             )
         }
 
-        let endCards = await Array(hand.cards[2 ... 3])
+        let endCards = Array(hand.cards[2 ... 3])
         
         for card in endCards {
-            let hintableSuits = await hand.getHintableSuits(for: card)
+            let hintableSuits = hand.getHintableSuits(for: card)
             XCTAssertEqual(
                 hintableSuits,
                 Set(Suit.allCases).subtracting([.red]),
@@ -134,21 +134,50 @@ class HandTests: XCTestCase {
         }
     }
     
-    func testApplyingSuitHintWithRainbows() async {
-        await useHand(withRainbows: true)
+    func testApplyingMultipleSuitHintsWithoutRainbows() {
+        useHand(withRainbows: false)
+        let card = hand.cards.first!
+
+        hand.applyHint(.suit(.blue), to: [card])
+        hand.applyHint(.suit(.green), to: [card])
         
-        let firstCard = await hand.cards.first!
+        XCTAssertEqual(
+            card.hintedSuits,
+            [.blue],
+             .WithoutRainbows.ignoresSubsequentSuitHints
+        )
+    }
+    
+    func testApplyingMultipleSuitHintsWithRainbows() {
+        useHand(withRainbows: true)
+        let card = hand.cards.first!
+
+        hand.applyHint(.suit(.blue), to: [card])
+        hand.applyHint(.suit(.green), to: [card])
+        hand.applyHint(.suit(.yellow), to: [card])
+        
+        XCTAssertEqual(
+            card.hintedSuits,
+            [.blue, .green],
+            .WithRainbows.ignoresSuitHintsAfterSecond
+        )
+    }
+    
+    func testApplyingSuitHintWithRainbows() {
+        useHand(withRainbows: true)
+        
+        let firstCard = hand.cards.first!
         
         // Assume the last card is a rainbow with one suit hinted
-        let lastCard = await hand.cards.last!
+        let lastCard = hand.cards.last!
         lastCard.setSuits([.green])
         
-        await hand.applyHint(.suit(.red), to: [firstCard])
+        hand.applyHint(.suit(.red), to: [firstCard])
         
-        let startingCards = await Array(hand.cards[0 ..< 3])
+        let startingCards = Array(hand.cards[0 ..< 3])
         
         for card in startingCards {
-            let hintableSuits = await hand.getHintableSuits(for: card)
+            let hintableSuits = hand.getHintableSuits(for: card)
             XCTAssertEqual(
                 hintableSuits,
                 Set(Suit.allCases).subtracting([.red]),
@@ -156,7 +185,7 @@ class HandTests: XCTestCase {
             )
         }
         
-        let hintableSuits = await hand.getHintableSuits(for: lastCard)
+        let hintableSuits = hand.getHintableSuits(for: lastCard)
         XCTAssertEqual(
             hintableSuits,
             Set(Suit.allCases).subtracting([.red, .green]),
@@ -164,131 +193,131 @@ class HandTests: XCTestCase {
         )
     }
     
-    func testSuitForUnsuitedCardWithoutRainbows() async {
-        await useHand(withRainbows: false)
-        let firstCard = await hand.cards.first!
-        let suits = await hand.getSuits(for: firstCard)
+    func testSuitForUnsuitedCardWithoutRainbows() {
+        useHand(withRainbows: false)
+        let firstCard = hand.cards.first!
+        let suits = hand.getSuits(for: firstCard)
         
         XCTAssertTrue(
             suits.isEmpty,
-            "A card with no information should not have a suit"
+            .suitForUnsuitedCard
         )
     }
     
-    func testSuitForSuitedCardWithoutRainbows() async {
-        await useHand(withRainbows: false)
-        let firstCard = await hand.cards.first!
-        await hand.applyHint(.suit(.yellow), to: [firstCard])
+    func testSuitForSuitedCardWithoutRainbows() {
+        useHand(withRainbows: false)
+        let firstCard = hand.cards.first!
+        hand.applyHint(.suit(.yellow), to: [firstCard])
 
-        let suits = await hand.getSuits(for: firstCard)
+        let suits = hand.getSuits(for: firstCard)
         
         XCTAssertEqual(
             suits,
             [.yellow],
-            "Without rainbows, a card told about a suit is that suit"
+            .WithoutRainbows.suitForSuitedCard
         )
     }
     
-    func testSuitForInferredUnsuitedCardWithoutRainbows() async {
-        await useHand(withRainbows: false)
-        let firstCard = await hand.cards.first!
-        // TODO - this might be an issue that this is permitted
-        await hand.applyHint(.suit(.red), to: [hand.cards[2]])
-        await hand.applyHint(.suit(.green), to: [hand.cards[2]])
-        await hand.applyHint(.suit(.yellow), to: [hand.cards[2]])
-        await hand.applyHint(.suit(.blue), to: [hand.cards[2]])
+    func testSuitForInferredUnsuitedCardWithoutRainbows() {
+        useHand(withRainbows: false)
+        let firstCard = hand.cards.first!
+
+        hand.applyHint(.suit(.red), to: [hand.cards[2]])
+        hand.applyHint(.suit(.green), to: [hand.cards[2]])
+        hand.applyHint(.suit(.yellow), to: [hand.cards[2]])
+        hand.applyHint(.suit(.blue), to: [hand.cards[2]])
         
-        let suits = await hand.getSuits(for: firstCard)
+        let suits = hand.getSuits(for: firstCard)
         
         XCTAssertEqual(
             suits,
             [.white],
-            "A card can know its suit if all other suits are eliminated"
+            .WithRainbows.inferredUnsuitedCard
         )
     }
     
-    func testSuitForUnsuitedCardWithRainbows() async {
-        await useHand(withRainbows: true)
-        let firstCard = await hand.cards.first!
-        let suits = await hand.getSuits(for: firstCard)
+    func testSuitForUnsuitedCardWithRainbows() {
+        useHand(withRainbows: true)
+        let firstCard = hand.cards.first!
+        let suits = hand.getSuits(for: firstCard)
         
         XCTAssertTrue(
             suits.isEmpty,
-            "A card with no information should not have a suit"
+            .suitForUnsuitedCard
         )
     }
     
-    func testSuitForSuitedCardWithRainbows() async {
-        await useHand(withRainbows: true)
-        let firstCard = await hand.cards.first!
-        await hand.applyHint(.suit(.yellow), to: [firstCard])
+    func testSuitForSuitedCardWithRainbows() {
+        useHand(withRainbows: true)
+        let firstCard = hand.cards.first!
+        hand.applyHint(.suit(.yellow), to: [firstCard])
 
-        let suits = await hand.getSuits(for: firstCard)
+        let suits = hand.getSuits(for: firstCard)
 
         XCTAssertEqual(
             suits,
             [.yellow],
-            "With rainbows, a card may not be only that suit"
+            .WithRainbows.suitForSuitedCard
         )
     }
     
-    func testSuitForMultiSuitedCardWithRainbows() async {
-        await useHand(withRainbows: true)
-        let firstCard = await hand.cards.first!
-        await hand.applyHint(.suit(.yellow), to: [firstCard])
-        await hand.applyHint(.suit(.green), to: [firstCard])
+    func testSuitForMultiSuitedCardWithRainbows() {
+        useHand(withRainbows: true)
+        let firstCard = hand.cards.first!
+        hand.applyHint(.suit(.yellow), to: [firstCard])
+        hand.applyHint(.suit(.green), to: [firstCard])
         
-        let suits = await hand.getSuits(for: firstCard)
+        let suits = hand.getSuits(for: firstCard)
 
         XCTAssertEqual(
             suits,
             [.yellow, .green],
-            "With rainbows, a card may be multiple suits"
+            .WithRainbows.suitForMultiSuitedCard
         )
     }
     
-    func testSuitForInferredUnsuitedCardWithRainbows() async {
-        await useHand(withRainbows: true)
-        let firstCard = await hand.cards.first!
+    func testSuitForInferredUnsuitedCardWithRainbows() {
+        useHand(withRainbows: true)
+        let firstCard = hand.cards.first!
 
-        await hand.applyHint(.suit(.red), to: [hand.cards[2]])
-        await hand.applyHint(.suit(.green), to: [hand.cards[2]])
-        await hand.applyHint(.suit(.yellow), to: [hand.cards[2]])
-        await hand.applyHint(.suit(.blue), to: [hand.cards[2]])
+        hand.applyHint(.suit(.red), to: [hand.cards[2]])
+        hand.applyHint(.suit(.green), to: [hand.cards[2]])
+        hand.applyHint(.suit(.yellow), to: [hand.cards[2]])
+        hand.applyHint(.suit(.blue), to: [hand.cards[2]])
         
-        let suits = await hand.getSuits(for: firstCard)
+        let suits = hand.getSuits(for: firstCard)
         
         XCTAssertEqual(
             suits,
             [.white],
-            "A card can know its suit if all other suits are eliminated"
+            .WithRainbows.suitForInferredUnsuitedCard
         )
     }
     
-    func testSuitForInferredSuitedCardWithRainbows() async {
-        await useHand(withRainbows: true)
-        let firstCard = await hand.cards.first!
+    func testSuitForInferredSuitedCardWithRainbows() {
+        useHand(withRainbows: true)
+        let firstCard = hand.cards.first!
 
-        await hand.applyHint(.suit(.red), to: [firstCard])
-        await hand.applyHint(.suit(.green), to: [hand.cards[2]])
-        await hand.applyHint(.suit(.yellow), to: [hand.cards[2]])
-        await hand.applyHint(.suit(.blue), to: [hand.cards[2]])
+        hand.applyHint(.suit(.red), to: [firstCard])
+        hand.applyHint(.suit(.green), to: [hand.cards[2]])
+        hand.applyHint(.suit(.yellow), to: [hand.cards[2]])
+        hand.applyHint(.suit(.blue), to: [hand.cards[2]])
         
-        let suits = await hand.getSuits(for: firstCard)
+        let suits = hand.getSuits(for: firstCard)
         
         XCTAssertEqual(
             suits,
             [.red],
-            "With rainbows, a card cannot make inferences about the remaining unhinted suit"
+            .WithRainbows.inferredSuitedCard
         )
     }
 
-    func testHintableValuesForValuedCard() async {
-        await useHand(withRainbows: true)
-        let firstCard = await hand.cards.first!
+    func testHintableValuesForValuedCard() {
+        useHand(withRainbows: true)
+        let firstCard = hand.cards.first!
         
         firstCard.setValue(.four)
-        let hintableValues = await hand.getHintableValues(for: firstCard)
+        let hintableValues = hand.getHintableValues(for: firstCard)
         
         XCTAssertTrue(
             hintableValues.isEmpty,
@@ -296,13 +325,13 @@ class HandTests: XCTestCase {
         )
     }
     
-    func testHintableValuesForCardWithNarrowedValues() async {
-        await useHand(withRainbows: true)
-        let firstCard = await hand.cards.first!
+    func testHintableValuesForCardWithNarrowedValues() {
+        useHand(withRainbows: true)
+        let firstCard = hand.cards.first!
         firstCard.removeHintableValue(.one)
         firstCard.removeHintableValue(.three)
 
-        let hintableValues = await hand.getHintableValues(for: firstCard)
+        let hintableValues = hand.getHintableValues(for: firstCard)
 
         XCTAssertEqual(
             hintableValues,
@@ -311,12 +340,12 @@ class HandTests: XCTestCase {
         )
     }
     
-    func testApplyingValueHint() async {
-        await useHand(withRainbows: false)
-        let firstCard = await hand.cards.first!
-        let remainingCards = await Array(hand.cards[1 ... 3])
+    func testApplyingValueHint() {
+        useHand(withRainbows: false)
+        let firstCard = hand.cards.first!
+        let remainingCards = Array(hand.cards[1 ... 3])
 
-        await hand.applyHint(.value(.five), to: [firstCard])
+        hand.applyHint(.value(.five), to: [firstCard])
 
         XCTAssertEqual(
             firstCard.value,
@@ -324,14 +353,14 @@ class HandTests: XCTestCase {
             .applyingValueHint
         )
 
-        let hintableValues = await hand.getHintableValues(for: firstCard)
+        let hintableValues = hand.getHintableValues(for: firstCard)
         XCTAssertTrue(
             hintableValues.isEmpty,
             .hintableValuesForValuedCard
         )
 
         for card in remainingCards {
-            let hintableValues = await hand.getHintableValues(for: card)
+            let hintableValues = hand.getHintableValues(for: card)
             XCTAssertEqual(
                 hintableValues,
                 Set(Value.allCases).subtracting([.five]),
@@ -340,19 +369,85 @@ class HandTests: XCTestCase {
         }
     }
     
-    func testShiftingCards() async {
-        // todo
-    }
+    func testDismissingInvalidCard() {
+        useHand(withRainbows: false)
+        
+        let initialCards = hand.cards
 
+        let card = Card()
+        hand.dismiss(card)
+        
+        XCTAssertEqual(
+            hand.cards,
+            initialCards,
+            .dismissingInvalidCard
+        )
+    }
+    
+    func testDismissingNewestCard() {
+        useHand(withRainbows: false)
+
+        let newestCard = hand.cards.last!
+        let olderCards = Array(hand.cards[0 ... 2])
+        
+        hand.dismiss(newestCard)
+        
+        XCTAssertNotEqual(
+            hand.cards.last,
+            newestCard,
+            .removesDismissedCards
+        )
+        XCTAssertEqual(
+            hand.cards.count,
+            4,
+            .replacesDismissedCards
+        )
+        let indicesForOlderCards = [0 ... 2]
+        indicesForOlderCards.forEach { index in
+            XCTAssertEqual(
+                hand.cards[index],
+                olderCards[index],
+                .olderCardsDoNotChangePosition
+            )
+        }
+    }
+    
+    func testDismissingOldestCard() {
+        useHand(withRainbows: false)
+
+        let oldestCard = hand.cards.first!
+        let remainingCards = Array(hand.cards[1 ... 3])
+        
+        hand.dismiss(oldestCard)
+
+        XCTAssertNotEqual(
+            hand.cards.first,
+            oldestCard,
+            .removesDismissedCards
+        )
+        XCTAssertEqual(
+            hand.cards.count,
+            4,
+            .replacesDismissedCards
+        )
+        let indicesForOlderCards = [0 ... 2]
+        indicesForOlderCards.forEach { index in
+            XCTAssertEqual(
+                hand.cards[index],
+                remainingCards[index],
+                .newerCardsChangePosition
+            )
+        }
+    }
     
     // MARK: - Helpers
     
-    private func getFirstCard() async -> Card {
-        await hand.cards.first!
+    private func getFirstCard() -> Card {
+        hand.cards.first!
     }
 
-    private func useHand(withRainbows: Bool) async {
-        hand = await Hand(
+    private func useHand(withRainbows: Bool) {
+        hand = Hand(
             configuration: Hand.Configuration(allowsRainbows: withRainbows),
             size: .four
         )
@@ -368,11 +463,19 @@ fileprivate extension String {
     static let hintableValuesForNarrowedValueCard = "A card with narrowed outstanding values should only have those as hintable values"
     static let applyingValueHint = "A card hinted with a value should have that value"
     static let valueHintNarrowsHintableValues = "A value hint should narrow the hintable values for cards not part of the hint"
+    static let suitForUnsuitedCard = "A card with no information should not have a suit"
+    static let removesDismissedCards = "Dismissed cards are removed from the hand"
+    static let replacesDismissedCards = "Dismissed cards are replaced"
+    static let olderCardsDoNotChangePosition = "Older cards do not change positions when a newer card is dismissed"
+    static let newerCardsChangePosition = "Newer cards change positions when a older card is dismissed"
+    static let dismissingInvalidCard = "Dismissing a card that is not in the hand should not impact cards in the hand"
     
     enum WithoutRainbows {
         static let hintableSuitsForUnsuitedCard = "An unsuited card can be any suit"
         static let hintableSuitsForSingleSuitedCard = "A single suited card has one hintable suit"
         static let applyingSuitHint = "Applying a suit hint should eliminate other hintable suits"
+        static let ignoresSubsequentSuitHints = "Ignores subsequent suit hints"
+        static let suitForSuitedCard = "Without rainbows, a card told about a suit is that suit"
     }
     
     enum WithRainbows {
@@ -380,5 +483,11 @@ fileprivate extension String {
         static let hintableSuitsForSingleSuitedCard = "A single suited card has four hintable suits"
         static let hintableSuitsForMultiSuitedCard = "A multi-suited card has no hintable suits"
         static let applyingSuitHint = "Applying a suit hint should set the suit for applicable cards and eliminate the suit for others"
+        static let ignoresSuitHintsAfterSecond = "Only applies the first two suit hints"
+        static let inferredUnsuitedCard = "A card can know its suit if all other suits are eliminated"
+        static let inferredSuitedCard = "With rainbows, a card cannot make inferences about the remaining unhinted suit"
+        static let suitForSuitedCard = "With rainbows, a card may not be only that suit"
+        static let suitForInferredUnsuitedCard = "A card can know its suit if all other suits are eliminated"
+        static let suitForMultiSuitedCard = "With rainbows, a card may be multiple suits"
     }
 }
