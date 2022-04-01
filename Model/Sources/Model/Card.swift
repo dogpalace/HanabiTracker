@@ -7,6 +7,8 @@ public class Card: ObservableObject, Equatable, Hashable {
     @Published public var value: Value?
     @Published public var hintableValues = Set(Value.allCases)
 
+    public let uuid: UUID
+    
     // To make it easy to preview
     public init(
         hintedSuits: Set<Suit> = [],
@@ -18,6 +20,7 @@ public class Card: ObservableObject, Equatable, Hashable {
         self.hintableSuits = hintableSuits
         self.value = value
         self.hintableValues = hintableValues
+        self.uuid = UUID()
     }
     
     func setSuits(_ suits: Set<Suit>) {
@@ -44,7 +47,7 @@ public class Card: ObservableObject, Equatable, Hashable {
         hasher.combine(hintedSuits.hashValue)
         hasher.combine(hintableSuits.hashValue)
         hasher.combine(value?.hashValue)
-        hasher.combine(ObjectIdentifier(self))
+        hasher.combine(uuid)
     }
     
     public static func == (lhs: Card, rhs: Card) -> Bool {
