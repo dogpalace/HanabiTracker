@@ -2,7 +2,7 @@ import Foundation
 
 public final class Hand: ObservableObject {
     
-    public enum Size: Int {
+    public enum Size: Int, CaseIterable {
         case four = 4
         case five = 5
     }
@@ -38,29 +38,6 @@ public final class Hand: ObservableObject {
         : getSuitsWithoutRainbows(for: card)
     }
     
-    private func getSuitsWithRainbows(for card: Card) -> Set<Suit> {
-        if card.hintableSuits.count == 1,
-            card.hintedSuits.isEmpty {
-            return card.hintableSuits
-        } else {
-            return card.hintedSuits
-        }
-    }
-    
-    private func getSuitsWithoutRainbows(for card: Card) -> Set<Suit> {
-        switch card.hintedSuits.count {
-        case 1: return card.hintedSuits
-        default: break
-        }
-        
-        switch card.hintableSuits.count {
-        case 1: return card.hintableSuits
-        default: break
-        }
-        
-        return []
-    }
-    
     public func getHintableSuits(for card: Card) -> Set<Suit> {
         configuration.allowsRainbows
             ? getHintableSuitsWithRainbows(for: card)
@@ -94,6 +71,35 @@ public final class Hand: ObservableObject {
         
         cards.remove(at: cardPosition)
         cards.append(Card())
+    }
+    
+    public func isDefinitelyRainbow(_ card: Card) -> Bool {
+        guard configuration.allowsRainbows else { return false }
+        
+        return getSuits(for: card).count > 1
+    }
+    
+    private func getSuitsWithRainbows(for card: Card) -> Set<Suit> {
+        if card.hintableSuits.count == 1,
+            card.hintedSuits.isEmpty {
+            return card.hintableSuits
+        } else {
+            return card.hintedSuits
+        }
+    }
+    
+    private func getSuitsWithoutRainbows(for card: Card) -> Set<Suit> {
+        switch card.hintedSuits.count {
+        case 1: return card.hintedSuits
+        default: break
+        }
+        
+        switch card.hintableSuits.count {
+        case 1: return card.hintableSuits
+        default: break
+        }
+        
+        return []
     }
     
     private func applySuitHintWithRainbows(suit: Suit, cards: [Card]) {

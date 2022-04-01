@@ -44,6 +44,8 @@ class HandTests: XCTestCase {
         
         XCTAssertEqual(count, 5, .hasFiveCards)
     }
+    
+    // MARK: - Suits
 
     func testHintableSuitsWithoutRainbowsForUnsuitedCard() throws {
         useHand(withRainbows: false)
@@ -311,6 +313,8 @@ class HandTests: XCTestCase {
             .WithRainbows.inferredSuitedCard
         )
     }
+    
+    // MARK: - Values
 
     func testHintableValuesForValuedCard() {
         useHand(withRainbows: true)
@@ -368,6 +372,8 @@ class HandTests: XCTestCase {
             )
         }
     }
+    
+    // MARK: - Card Dismissal
     
     func testDismissingInvalidCard() {
         useHand(withRainbows: false)
@@ -440,6 +446,58 @@ class HandTests: XCTestCase {
         }
     }
     
+    // MARK: - Rainbow determination
+    
+    func testIsRainbowWithUnsuitedCardWithoutRainbows() {
+        useHand(withRainbows: false)
+
+        XCTAssertFalse(
+            hand.isDefinitelyRainbow(hand.cards.first!),
+            .WithoutRainbows.cannotBeRainbowCard
+        )
+    }
+    
+    func testIsRainbowWithSuitedCardWithoutRainbows() {
+        useHand(withRainbows: false)
+        hand.applyHint(.suit(.red), to: [hand.cards.first!])
+        
+        XCTAssertFalse(
+            hand.isDefinitelyRainbow(hand.cards.first!),
+            .WithoutRainbows.cannotBeRainbowCard
+        )
+    }
+
+    func testIsRainbowWithUnsuitedCardWithRainbows() {
+        useHand(withRainbows: true)
+
+        XCTAssertFalse(
+            hand.isDefinitelyRainbow(hand.cards.first!),
+            .WithRainbows.cannotBeRainbowCard
+        )
+    }
+
+    func testIsRainbowForSuitedCardWithRainbows() {
+        useHand(withRainbows: true)
+        hand.applyHint(.suit(.red), to: [hand.cards.first!])
+
+        XCTAssertFalse(
+            hand.isDefinitelyRainbow(hand.cards.first!),
+            .WithRainbows.cannotBeRainbowCard
+        )
+    }
+    
+    func testIsRainbowForMultiSuitedCardWithRainbows() {
+        useHand(withRainbows: true)
+        
+        hand.applyHint(.suit(.red), to: [hand.cards.first!])
+        hand.applyHint(.suit(.blue), to: [hand.cards.first!])
+
+        XCTAssertTrue(
+            hand.isDefinitelyRainbow(hand.cards.first!),
+            .WithRainbows.isRainbowCard
+        )
+    }
+    
     // MARK: - Helpers
     
     private func getFirstCard() -> Card {
@@ -476,6 +534,7 @@ fileprivate extension String {
         static let applyingSuitHint = "Applying a suit hint should eliminate other hintable suits"
         static let ignoresSubsequentSuitHints = "Ignores subsequent suit hints"
         static let suitForSuitedCard = "Without rainbows, a card told about a suit is that suit"
+        static let cannotBeRainbowCard = "A card cannot be a rainbow card when rainbows are not allowed"
     }
     
     enum WithRainbows {
@@ -489,5 +548,7 @@ fileprivate extension String {
         static let suitForSuitedCard = "With rainbows, a card may not be only that suit"
         static let suitForInferredUnsuitedCard = "A card can know its suit if all other suits are eliminated"
         static let suitForMultiSuitedCard = "With rainbows, a card may be multiple suits"
+        static let cannotBeRainbowCard = "A card with fewer than two hinted suits cannot be definitively rainbow"
+        static let isRainbowCard = "A card with two hinted suits is definitely rainbow"
     }
 }
