@@ -1,5 +1,5 @@
 import Foundation
 
-public enum Value: CaseIterable {
-    case one, two, three, four, five
+public enum Value: Int, CaseIterable {
+    case one = 1, two = 2, three = 3, four = 4, five = 5
 }
