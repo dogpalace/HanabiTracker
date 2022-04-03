@@ -10,4 +10,27 @@ final class SuitTests: XCTestCase {
             "Should be a finite number of suits"
         )
     }
+    
+    func testOrder() {
+        XCTAssertLessThan(
+            Suit.red,
+            Suit.yellow,
+            "Suits should be in a predictable order"
+        )
+        XCTAssertLessThan(
+            Suit.yellow,
+            Suit.green,
+            "Suits should be in a predictable order"
+        )
+        XCTAssertLessThan(
+            Suit.green,
+            Suit.blue,
+            "Suits should be in a predictable order"
+        )
+        XCTAssertLessThan(
+            Suit.blue,
+            Suit.white,
+            "Suits should be in a predictable order"
+        )
+    }
 }

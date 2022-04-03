@@ -69,9 +69,8 @@ class CardTests: XCTestCase {
     func testSettingValue() {
         card.setValue(.one)
         
-        XCTAssertEqual(
-            card.hintableValues,
-            Set(Value.allCases).subtracting([.one]),
+        XCTAssertTrue(
+            card.hintableValues.isEmpty,
             .settingValue
         )
     }
@@ -93,7 +92,7 @@ fileprivate extension String {
     static let defaultOutstandingSuits = "Outstanding suits contains all suits"
     static let defaultOutstandingValues = "Outstanding values contains all values"
     static let settingSuit = "Setting a suit should remove it from the outstanding suits"
-    static let settingValue = "Setting a value should remove it from the outstanding values"
+    static let settingValue = "Setting a value should remove all outstanding values"
     static let removeOutstandingSuit = "A card can remove a suit from its outstanding suits"
     static let removeOutstandingValue = "A card can remove a value from its outstanding values"
 }

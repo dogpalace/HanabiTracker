@@ -36,7 +36,7 @@ public class Card: ObservableObject, Equatable, Hashable {
     func setValue(_ value: Value) {
         self.value = value
         
-        hintableValues.remove(value)
+        hintableValues = []
     }
     
     func removeHintableValue(_ value: Value) {

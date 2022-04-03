@@ -16,15 +16,70 @@ public final class Hand: ObservableObject {
     }
 
     @Published public var cards: [Card]
-    public let configuration: Configuration
-    let size: Size
+    @Published public var selectedCards = IndexSet()
+    
+    public private(set) var allowsRainbows: Bool
+    private(set) var size: Size
     
     public init(
-        configuration: Configuration,
+        allowsRainbows: Bool,
         size: Size
     ) {
-        self.configuration = configuration
+        self.allowsRainbows = allowsRainbows
         self.size = size
+        
+        cards = []
+        (0 ..< self.size.rawValue).forEach { _ in
+            cards.append(Card())
+        }
+    }
+    
+    public func toggleSelection(of card: Card) {
+        guard let index = cards.firstIndex(of: card) else { return }
+            
+        if selectedCards.contains(index) {
+            selectedCards.remove(index)
+        } else {
+            selectedCards.insert(index)
+        }
+    }
+    
+    public func dismissSelected() {
+        guard selectedCards.count == 1,
+              let index = selectedCards.first
+        else { return }
+        
+        dismiss(cards[index])
+    }
+    
+    public func isCardSelected(_ card: Card) -> Bool {
+        guard let index = cards.firstIndex(of: card) else { return false }
+
+        return selectedCards.contains(index)
+    }
+    
+    public var hintableValues: [Value] {
+        selectedCards
+            .map { cards[$0] }
+            .reduce(Set(Value.allCases)) { partialResult, card in
+                partialResult.intersection(card.hintableValues)
+            }
+            .sorted()
+    }
+    
+    public var hintableSuits: [Suit] {
+        selectedCards
+            .map { cards[$0] }
+            .reduce(Set(Suit.allCases)) { partialResult, card in
+                partialResult.intersection(getHintableSuits(for: card))
+            }
+            .sorted()
+    }
+    
+    public func reset(allowsRainbows: Bool, size: Size) {
+        self.allowsRainbows = allowsRainbows
+        self.size = size
+        self.selectedCards = []
         
         cards = []
         (0 ..< self.size.rawValue).forEach { _ in
@@ -38,25 +93,23 @@ public final class Hand: ObservableObject {
             return getHintableSuits(for: card).first
         }
         
-        return configuration.allowsRainbows ? nil : card.hintedSuits.first
+        return allowsRainbows ? nil : card.hintedSuits.first
     }
     
     public func getHintableSuits(for card: Card) -> Set<Suit> {
-        configuration.allowsRainbows
+        allowsRainbows
             ? getHintableSuitsWithRainbows(for: card)
             : getHintableSuitsWithoutRainbows(for: card)
     }
     
-    public func getHintableValues(for card: Card) -> Set<Value> {
-        card.value == nil ? card.hintableValues : []
-    }
-    
-    public func applyHint(_ hint: Hint, to hintedCards: [Card]) {
-        let otherCards = Set(self.cards).subtracting(Set(hintedCards))
+    public func applyHint(_ hint: Hint) {
+        let hintedCards = selectedCards.map { cards[$0] }
+        
+        let otherCards = Set(cards).subtracting(Set(hintedCards))
         
         switch hint {
         case let .suit(suit):
-            if configuration.allowsRainbows {
+            if allowsRainbows {
                 applySuitHintWithRainbows(suit: suit, cards: hintedCards)
             } else {
                 applySuitHintWithoutRainbows(suit: suit, cards: hintedCards)
@@ -69,7 +122,7 @@ public final class Hand: ObservableObject {
         }
     }
     
-    public func dismiss(_ card: Card) {
+    private func dismiss(_ card: Card) {
         guard let cardPosition = cards.firstIndex(of: card) else { return }
         
         cards.remove(at: cardPosition)
@@ -77,7 +130,7 @@ public final class Hand: ObservableObject {
     }
     
     public func isDefinitelyRainbow(_ card: Card) -> Bool {
-        guard configuration.allowsRainbows else { return false }
+        guard allowsRainbows else { return false }
         
         return card.hintedSuits.count == 2
     }

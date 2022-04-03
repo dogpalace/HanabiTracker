@@ -1,5 +1,13 @@
 import Foundation
 
-public enum Value: Int, CaseIterable {
-    case one = 1, two = 2, three = 3, four = 4, five = 5
+public enum Value: Int, CaseIterable, Comparable {    
+    case one = 1
+    case two
+    case three
+    case four
+    case five
+
+    public static func < (lhs: Value, rhs: Value) -> Bool {
+        lhs.rawValue < rhs.rawValue
+    }
 }
