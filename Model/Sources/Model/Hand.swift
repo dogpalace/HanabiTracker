@@ -88,9 +88,12 @@ public final class Hand: ObservableObject {
     }
     
     public func getSuit(for card: Card) -> Suit? {
-        if card.hintedSuits.isEmpty,
-           card.hintableSuits.count == 1 {
+        if card.hintedSuits.isEmpty, card.hintableSuits.count == 1 {
             return getHintableSuits(for: card).first
+        }
+        
+        if card.hintedSuits.count == 1, card.hintableSuits.count == 0 {
+            return card.hintedSuits.first
         }
         
         return allowsRainbows ? nil : card.hintedSuits.first
