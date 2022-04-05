@@ -2,7 +2,7 @@ import SwiftUI
 import Model
 
 struct Card: View {
-    @ObservedObject var card: Model.Card
+    var card: Model.Card
     var inferredSuit: Suit?
     var hintableSuits: [Suit]
     let isRainbow: Bool
@@ -120,7 +120,7 @@ struct Card_Previews: PreviewProvider {
     }
     
     struct Preview: View {
-        @StateObject var card = Model.Card(hintableValues: [.three, .four])
+        var card = Model.Card(hintableValues: [.three, .four])
         var hintableSuits = [Suit]()
         var hintableValues = Value.allCases
         let isRainbow: Bool
@@ -134,10 +134,7 @@ struct Card_Previews: PreviewProvider {
             self.hintableValues = hintableValues
             self.isRainbow = isRainbow
             
-            _card = .init(
-                wrappedValue:
-                    Model.Card(hintableValues: Set(hintableValues))
-            )
+            card = Model.Card(hintableValues: Set(hintableValues))
         }
         
         var body: some View {

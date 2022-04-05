@@ -1,6 +1,6 @@
 import Foundation
 
-public final class Hand: ObservableObject {
+public final class Hand: ObservableObject, Equatable {
     
     public enum Size: Int, CaseIterable {
         case four = 4
@@ -106,22 +106,27 @@ public final class Hand: ObservableObject {
     }
     
     public func applyHint(_ hint: Hint) {
-        let hintedCards = selectedCards.map { cards[$0] }
-        
-        let otherCards = Set(cards).subtracting(Set(hintedCards))
+        let unselectedCardIndices = cards.indices.filter { !selectedCards.contains($0) }
         
         switch hint {
         case let .suit(suit):
             if allowsRainbows {
-                applySuitHintWithRainbows(suit: suit, cards: hintedCards)
+                applySuitHintWithRainbows(suit: suit, hintedIndices: selectedCards)
             } else {
-                applySuitHintWithoutRainbows(suit: suit, cards: hintedCards)
+                applySuitHintWithoutRainbows(suit: suit, hintedIndices: selectedCards)
             }
-            otherCards.forEach { $0.removeHintableSuit(suit) }
+            
+            unselectedCardIndices.forEach {
+                cards[$0] = cards[$0].removingHintableSuit(suit)
+            }
 
         case let .value(value):
-            hintedCards.forEach { $0.setValue(value) }
-            otherCards.forEach { $0.removeHintableValue(value) }
+            selectedCards.forEach {
+                cards[$0] = cards[$0].settingValue(value)
+            }
+            unselectedCardIndices.forEach {
+                cards[$0] = cards[$0].removingHintableValue(value)
+            }
         }
     }
     
@@ -138,20 +143,28 @@ public final class Hand: ObservableObject {
         return card.hintedSuits.count == 2
     }
     
-    private func applySuitHintWithRainbows(suit: Suit, cards: [Card]) {
-        cards.forEach { card in
-            guard card.hintedSuits.count < 2 else { return }
+    private func applySuitHintWithRainbows(suit: Suit, hintedIndices: IndexSet) {
+        self.cards = self.cards
+            .enumerated()
+            .map {
+                guard hintedIndices.contains($0.offset),
+                      $0.element.hintedSuits.count < 2
+                else { return $0.element }
             
-            card.setSuits(card.hintedSuits.union([suit]))
+                return $0.element.settingSuits($0.element.hintedSuits.union([suit]))
         }
     }
     
-    private func applySuitHintWithoutRainbows(suit: Suit, cards: [Card]) {
-        cards.forEach { card in
-            guard card.hintedSuits.count < 1 else { return }
-            
-            card.setSuits([suit])
-        }
+    private func applySuitHintWithoutRainbows(suit: Suit, hintedIndices: IndexSet) {
+        self.cards = self.cards
+            .enumerated()
+            .map {
+                guard hintedIndices.contains($0.offset),
+                      $0.element.hintedSuits.count < 1
+                else { return $0.element }
+                
+                return $0.element.settingSuits([suit])
+            }
     }
     
     private func getHintableSuitsWithoutRainbows(
@@ -176,6 +189,45 @@ public final class Hand: ObservableObject {
             
         default:
             return []
+        }
+    }
+    
+    public static func createDeepCopy(of hand: Hand) -> Hand {
+        let newCards = hand.cards.map {
+            Card(
+                hintedSuits: $0.hintedSuits,
+                hintableSuits: $0.hintableSuits,
+                value: $0.value,
+                hintableValues: $0.hintableValues,
+                uuid: $0.uuid
+            )
+        }
+        let newHand = Hand(
+            allowsRainbows: hand.allowsRainbows,
+            size: hand.size
+        )
+        newHand.cards = newCards
+        
+        return newHand
+    }
+    
+    public func restore(from hand: Hand) {
+        allowsRainbows = hand.allowsRainbows
+        size = hand.size
+        cards = hand.cards
+    }
+    
+    public static func ==(lhs: Hand, rhs: Hand) -> Bool {
+        return lhs.allowsRainbows == rhs.allowsRainbows
+        && lhs.size == rhs.size
+        && lhs.cards.enumerated().allSatisfy { pair in
+            let card = pair.element
+            let otherCard = rhs.cards[pair.offset]
+
+            return card.hintableSuits == otherCard.hintableSuits
+            && card.hintableValues == otherCard.hintableValues
+            && card.hintedSuits == otherCard.hintedSuits
+            && card.value == otherCard.value
         }
     }
 }

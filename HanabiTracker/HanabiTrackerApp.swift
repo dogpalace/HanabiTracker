@@ -6,9 +6,14 @@ struct Options: Equatable {
     var allowsRainbows = false
 }
 
+class GameRecord: ObservableObject {
+    @Published var hands = [Hand]()
+}
+
 @main
 struct HanabiTrackerApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject private var gameRecord = GameRecord()
     @StateObject private var hand: Hand
     @State private var options: Options
     
@@ -28,11 +33,26 @@ struct HanabiTrackerApp: App {
             GameView()
                 .environment(\.options, $options)
                 .environmentObject(hand)
+                .environmentObject(gameRecord)
                 .onChange(of: options) {
+                    gameRecord.hands = []
                     hand.reset(
                         allowsRainbows: $0.allowsRainbows,
                         size: $0.handSize
                     )
+                }
+                .onChange(of: hand.cards) { newCards in
+                    guard gameRecord.hands.last?.cards != newCards else {
+                        return
+                    }
+                    
+                    gameRecord.hands.append(Hand.createDeepCopy(of: hand))
+                }
+                .onAppear {
+                    // Store the initial hand
+                    guard gameRecord.hands.isEmpty else { return }
+                    
+                    gameRecord.hands.append(Hand.createDeepCopy(of: hand))
                 }
         }
     }

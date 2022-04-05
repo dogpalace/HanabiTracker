@@ -1,11 +1,11 @@
 import Foundation
 import SwiftUI
 
-public class Card: ObservableObject, Equatable, Hashable {
-    @Published public var hintedSuits = Set<Suit>()
-    @Published public var hintableSuits = Set(Suit.allCases)
-    @Published public var value: Value?
-    @Published public var hintableValues = Set(Value.allCases)
+public struct Card: Equatable, Hashable {
+    public var hintedSuits = Set<Suit>()
+    public var hintableSuits = Set(Suit.allCases)
+    public var value: Value?
+    public var hintableValues = Set(Value.allCases)
 
     public let uuid: UUID
     
@@ -14,33 +14,59 @@ public class Card: ObservableObject, Equatable, Hashable {
         hintedSuits: Set<Suit> = [],
         hintableSuits: Set<Suit> = Set(Suit.allCases),
         value: Value? = nil,
-        hintableValues: Set<Value> = Set(Value.allCases)
+        hintableValues: Set<Value> = Set(Value.allCases),
+        uuid: UUID = UUID()
     ) {
         self.hintedSuits = hintedSuits
         self.hintableSuits = hintableSuits
         self.value = value
         self.hintableValues = hintableValues
-        self.uuid = UUID()
+        self.uuid = uuid
     }
     
-    func setSuits(_ suits: Set<Suit>) {
-        self.hintedSuits = suits
+    func settingSuits(_ suits: Set<Suit>) -> Card {
+        Card(
+            hintedSuits: suits,
+            hintableSuits: hintableSuits.subtracting(suits),
+            value: value,
+            hintableValues: hintableValues,
+            uuid: uuid
+        )
+    }
+    
+    func removingHintableSuit(_ suit: Suit) -> Card {
+        var updatedHintableSuits = hintableSuits
+        updatedHintableSuits.remove(suit)
         
-        hintableSuits = hintableSuits.subtracting(suits)
+        return Card(
+            hintedSuits: hintedSuits,
+            hintableSuits: updatedHintableSuits,
+            value: value,
+            hintableValues: hintableValues,
+            uuid: uuid
+        )
     }
     
-    func removeHintableSuit(_ suit: Suit) {
-        hintableSuits.remove(suit)
+    func settingValue(_ value: Value) -> Card {
+        Card(
+            hintedSuits: hintedSuits,
+            hintableSuits: hintableSuits,
+            value: value,
+            hintableValues: [],
+            uuid: uuid
+        )
     }
     
-    func setValue(_ value: Value) {
-        self.value = value
+    func removingHintableValue(_ value: Value) -> Card {
+        var updatedHintableValues = hintableValues
+        updatedHintableValues.remove(value)
         
-        hintableValues = []
-    }
-    
-    func removeHintableValue(_ value: Value) {
-        hintableValues.remove(value)
+        return Card(
+            hintedSuits: hintedSuits,
+            hintableSuits: hintableSuits,
+            value: self.value,
+            hintableValues: updatedHintableValues
+        )
     }
     
     public func hash(into hasher: inout Hasher) {
@@ -51,6 +77,10 @@ public class Card: ObservableObject, Equatable, Hashable {
     }
     
     public static func == (lhs: Card, rhs: Card) -> Bool {
-        lhs === rhs
+        lhs.hintedSuits == rhs.hintedSuits
+        && lhs.hintableSuits == rhs.hintableSuits
+        && lhs.value == rhs.value
+        && lhs.hintableValues == rhs.hintableValues
+        && lhs.uuid == rhs.uuid
     }
 }

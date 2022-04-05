@@ -612,6 +612,73 @@ class HandTests: XCTestCase {
         XCTAssertEqual(hand.size, .five, .resettingUpdatesHandProperties)
     }
     
+    // MARK: - Copying
+    
+    func testCreatingDeepCopy() {
+        useHand(withRainbows: true)
+        let hand2 = Hand.createDeepCopy(of: hand)
+        
+        XCTAssertEqual(
+            hand.allowsRainbows,
+            hand2.allowsRainbows,
+            "A copy of a hand should have the same properties as the original hand"
+        )
+        XCTAssertEqual(
+            hand.size,
+            hand2.size,
+            "A copy of a hand should have the same properties as the original hand"
+        )
+        hand.cards.enumerated().forEach { pair in
+            let card = pair.element
+            let otherCard = hand2.cards[pair.offset]
+
+            XCTAssertEqual(card.hintableSuits, otherCard.hintableSuits)
+            XCTAssertEqual(card.hintableValues, otherCard.hintableValues)
+            XCTAssertEqual(card.hintedSuits, otherCard.hintedSuits)
+            XCTAssertEqual(card.value, otherCard.value)
+            XCTAssertNotEqual(card.uuid, otherCard.uuid)
+        }
+    }
+    
+    // MARK: - Equatability
+    
+    func testEqualHands() {
+        useHand(withRainbows: true)
+        let hand2 = Hand(allowsRainbows: true, size: .four)
+        hand2.cards = hand.cards
+
+        XCTAssertEqual(
+            hand,
+            hand2,
+            "Hands with equal properties and cards are equal"
+        )
+    }
+
+    func testHandsWithDifferentCards() {
+        useHand(withRainbows: true)
+        let hand2 = Hand(allowsRainbows: true, size: .four)
+
+        XCTAssertEqual(
+            hand,
+            hand2,
+            "Hands with equal properties and cards are equal"
+        )
+    }
+
+    func testHandsWithDifferentlyHintedCards() {
+        useHand(withRainbows: true)
+        let hand2 = Hand(allowsRainbows: true, size: .four)
+
+        selectFirstCard()
+        hand.applyHint(.value(.one))
+
+        XCTAssertNotEqual(
+            hand,
+            hand2,
+            "Hands with differently hinted cards are not equal"
+        )
+    }
+
     // MARK: - Helpers
     
     private func selectFirstCard() {

@@ -3,10 +3,10 @@ import Model
 
 struct GameView: View {
     @EnvironmentObject var hand: Hand
+    @EnvironmentObject var gameRecord: GameRecord
     @State private var isShowingOptions = false
     @State private var isPresentingHintSheet = false
     @State private var selectedHint: Hint?
-    @State private var isShowingUseCardConfirmation = false
     
     var body: some View {
         NavigationView {
@@ -14,6 +14,13 @@ struct GameView: View {
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
                     Button { isShowingOptions = true } label: { Image(systemName: "gear") }
+                    .font(.title)
+                    Button("Undo") {
+                        gameRecord.hands.removeLast()
+                        let priorRecord = gameRecord.hands.removeLast()
+                        hand.restore(from: priorRecord)
+                    }
+                    .disabled(gameRecord.hands.count < 2)
                     .font(.title)
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -29,23 +36,6 @@ struct GameView: View {
                 onDismiss: handleHintSheetDismissal,
                 content: { hintSheet }
             )
-            .alert(isPresented: $isShowingUseCardConfirmation) {
-                Alert(
-                    title: Text("Play / Dismiss Card ?"),
-                    message: Text("Using a card cannot be undone"),
-                    primaryButton: .destructive(
-                        Text("Use Card"),
-                        action: {
-                            hand.dismissSelected()
-                            hand.selectedCards = []
-                            isShowingUseCardConfirmation = false
-                        }
-                    ),
-                    secondaryButton: .default(Text("Cancel"), action: {
-                        isShowingUseCardConfirmation = false
-                    })
-                )
-            }
         }
         .padding()
     }
@@ -67,11 +57,9 @@ struct GameView: View {
     
     @ViewBuilder
     private var useCardButton: some View {
-        Button(
-            "Play / Discard",
-            role: .destructive
-        ) {
-            isShowingUseCardConfirmation = true
+        Button("Play / Discard") {
+            hand.dismissSelected()
+            hand.selectedCards = []
         }
         .font(.title)
         .disabled(hand.selectedCards.count != 1)
