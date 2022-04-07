@@ -28,24 +28,31 @@ struct Card: View {
     
     private var valueInformation: some View {
         Group {
-            if let value = card.value {
-                Image(systemName: "\(value.rawValue).square.fill")
-                    .font(.largeTitle)
+            if let value = inferredValue {
+                Text("\(value.rawValue)")
             } else {
-                HStack(spacing: 0) {
-                    ForEach(
-                        Value.allCases.filter {
-                            card.hintableValues.contains($0)
-                        },
-                        id: \.self
-                    ) {
-                        Image(systemName: "\($0.rawValue).square.fill")
-                            .font(.title3)
-                    }
-                }
+                Text(valueString)
             }
         }
+        .font(.title2)
         .foregroundColor(.primary)
+    }
+    
+    private var inferredValue: Value? {
+        if let value = card.value {
+            return value
+        }
+        if card.hintableValues.count == 1 {
+            return card.hintableValues.first
+        }
+        return nil
+    }
+    
+    private var valueString: String {
+        Value.allCases
+            .filter { card.hintableValues.contains($0) }
+            .map { "\($0.rawValue)" }
+            .joined(separator: " ")
     }
     
     @ViewBuilder
