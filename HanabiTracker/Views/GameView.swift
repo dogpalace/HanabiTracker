@@ -37,6 +37,7 @@ struct GameView: View {
                     content: { hintSheet }
                 )
         }
+        .navigationViewStyle(StackNavigationViewStyle())
         .padding()
     }
     
