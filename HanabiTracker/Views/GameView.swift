@@ -10,32 +10,32 @@ struct GameView: View {
     
     var body: some View {
         NavigationView {
-        CurrentHand()
-            .toolbar {
-                ToolbarItemGroup(placement: .navigationBarLeading) {
-                    Button { isShowingOptions = true } label: { Image(systemName: "gear") }
-                    .font(.title)
-                    Button("Undo") {
-                        gameRecord.hands.removeLast()
-                        let priorRecord = gameRecord.hands.removeLast()
-                        hand.restore(from: priorRecord)
+            CurrentHand()
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigationBarLeading) {
+                        Button { isShowingOptions = true } label: { Image(systemName: "gear") }
+                        .font(.title)
+                        Button("Undo") {
+                            gameRecord.hands.removeLast()
+                            let priorRecord = gameRecord.hands.removeLast()
+                            hand.restore(from: priorRecord)
+                        }
+                        .disabled(gameRecord.hands.count < 2)
+                        .font(.title)
                     }
-                    .disabled(gameRecord.hands.count < 2)
-                    .font(.title)
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
+                        useCardButton
+                        hintSheetButton
+                    }
                 }
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    useCardButton
-                    hintSheetButton
+                .sheet(isPresented: $isShowingOptions) {
+                    GameOptions(isPresented: $isShowingOptions)
                 }
-            }
-            .sheet(isPresented: $isShowingOptions) {
-                GameOptions(isPresented: $isShowingOptions)
-            }
-            .sheet(
-                isPresented: $isPresentingHintSheet,
-                onDismiss: handleHintSheetDismissal,
-                content: { hintSheet }
-            )
+                .sheet(
+                    isPresented: $isPresentingHintSheet,
+                    onDismiss: handleHintSheetDismissal,
+                    content: { hintSheet }
+                )
         }
         .padding()
     }
