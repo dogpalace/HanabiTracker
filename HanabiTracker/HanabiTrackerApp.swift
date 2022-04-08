@@ -1,10 +1,6 @@
 import SwiftUI
 import Model
 
-class GameRecord: ObservableObject {
-    @Published var hands = [Hand]()
-}
-
 @main
 struct HanabiTrackerApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
