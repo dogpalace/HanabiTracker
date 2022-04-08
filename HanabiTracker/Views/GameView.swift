@@ -94,9 +94,11 @@ struct GameView_Previews: PreviewProvider {
             allowsRainbows: true,
             size: .four
         )
+        @State var gameRecord = GameRecord()
         
         var body: some View {
             GameView()
+                .environmentObject(gameRecord)
                 .environmentObject(hand)
         }
     }

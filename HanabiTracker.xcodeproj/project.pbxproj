@@ -17,6 +17,7 @@
 		F479609B27F605BA003BD4E7 /* GameOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F479609A27F605BA003BD4E7 /* GameOptions.swift */; };
 		F479609D27F76285003BD4E7 /* ValueHint.swift in Sources */ = {isa = PBXBuildFile; fileRef = F479609C27F76285003BD4E7 /* ValueHint.swift */; };
 		F479609F27F8CB66003BD4E7 /* OptionsEnvironmentKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = F479609E27F8CB66003BD4E7 /* OptionsEnvironmentKey.swift */; };
+		F4904B3F2800A0B2003AE3D1 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4904B3E2800A0B2003AE3D1 /* MainView.swift */; };
 		F4F9ADDB27EFD4FE002D1CBD /* HanabiTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F9ADDA27EFD4FE002D1CBD /* HanabiTrackerApp.swift */; };
 		F4F9ADDD27EFD4FE002D1CBD /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4F9ADDC27EFD4FE002D1CBD /* GameView.swift */; };
 		F4F9ADDF27EFD500002D1CBD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4F9ADDE27EFD500002D1CBD /* Assets.xcassets */; };
@@ -53,6 +54,7 @@
 		F479609A27F605BA003BD4E7 /* GameOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameOptions.swift; sourceTree = "<group>"; };
 		F479609C27F76285003BD4E7 /* ValueHint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueHint.swift; sourceTree = "<group>"; };
 		F479609E27F8CB66003BD4E7 /* OptionsEnvironmentKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsEnvironmentKey.swift; sourceTree = "<group>"; };
+		F4904B3E2800A0B2003AE3D1 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		F4F9ADD727EFD4FE002D1CBD /* HanabiTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HanabiTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4F9ADDA27EFD4FE002D1CBD /* HanabiTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HanabiTrackerApp.swift; sourceTree = "<group>"; };
 		F4F9ADDC27EFD4FE002D1CBD /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 				F479609827F25F95003BD4E7 /* Hints.swift */,
 				F479609A27F605BA003BD4E7 /* GameOptions.swift */,
 				F479609C27F76285003BD4E7 /* ValueHint.swift */,
+				F4904B3E2800A0B2003AE3D1 /* MainView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -308,6 +311,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F479609D27F76285003BD4E7 /* ValueHint.swift in Sources */,
+				F4904B3F2800A0B2003AE3D1 /* MainView.swift in Sources */,
 				F42376B027F24710005DFE3F /* CurrentHand.swift in Sources */,
 				F4F9ADDD27EFD4FE002D1CBD /* GameView.swift in Sources */,
 				F479609727F25E64003BD4E7 /* ColorSuitMap.swift in Sources */,
