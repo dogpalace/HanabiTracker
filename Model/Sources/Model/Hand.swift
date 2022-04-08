@@ -7,14 +7,6 @@ public final class Hand: ObservableObject, Equatable {
         case five = 5
     }
     
-    public struct Configuration {
-        public var allowsRainbows: Bool
-        
-        public init(allowsRainbows: Bool) {
-            self.allowsRainbows = allowsRainbows
-        }
-    }
-
     @Published public var cards: [Card]
     @Published public var selectedCards = IndexSet()
     
