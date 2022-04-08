@@ -1,11 +1,6 @@
 import SwiftUI
 import Model
 
-struct Options: Equatable {
-    var handSize = Hand.Size.four
-    var allowsRainbows = false
-}
-
 class GameRecord: ObservableObject {
     @Published var hands = [Hand]()
 }
