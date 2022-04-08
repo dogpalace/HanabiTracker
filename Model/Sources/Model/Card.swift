@@ -25,9 +25,13 @@ public struct Card: Equatable, Hashable {
     }
     
     func settingSuits(_ suits: Set<Suit>) -> Card {
-        Card(
+        let hintableSuits = hintedSuits.count > 0
+        ? []
+        : self.hintableSuits.subtracting(suits)
+        
+        return Card(
             hintedSuits: suits,
-            hintableSuits: hintableSuits.subtracting(suits),
+            hintableSuits: hintableSuits,
             value: value,
             hintableValues: hintableValues,
             uuid: uuid

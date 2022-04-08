@@ -38,7 +38,7 @@ class CardTests: XCTestCase {
     }
     
     func testSettingSuit() {
-        card.setSuits([.red])
+        card = card.settingSuits([.red])
         
         XCTAssertEqual(
             card.hintableSuits,
@@ -48,7 +48,7 @@ class CardTests: XCTestCase {
     }
     
     func testRemovingOutstandingSuit() {
-        card.removeHintableSuit(.green)
+        card = card.removingHintableSuit(.green)
         let outstandingSuits = card.hintableSuits
         
         XCTAssertEqual(
@@ -67,7 +67,7 @@ class CardTests: XCTestCase {
     }
     
     func testSettingValue() {
-        card.setValue(.one)
+        card = card.settingValue(.one)
         
         XCTAssertTrue(
             card.hintableValues.isEmpty,
@@ -76,7 +76,7 @@ class CardTests: XCTestCase {
     }
     
     func testRemovingOutstandingValue() {
-        card.removeHintableValue(.five)
+        card = card.removingHintableValue(.five)
         
         XCTAssertEqual(
             card.hintableValues,

@@ -61,8 +61,9 @@ class HandTests: XCTestCase {
     
     func testHintableSuitsWithoutRainbowsForSuitedCard() throws {
         useHand(withRainbows: false)
+        selectFirstCard()
+        hand.applyHint(.suit(.green))
         let card = getFirstCard()
-        card.setSuits([.green])
         let hintableSuits = hand.getHintableSuits(for: card)
                 
         XCTAssertEqual(
@@ -74,8 +75,8 @@ class HandTests: XCTestCase {
     
     func testHintableSuitsWithRainbowsForUnsuitedCard() {
         useHand(withRainbows: true)
-        let card = getFirstCard()
-        let hintableSuits = hand.getHintableSuits(for: card)
+        
+        let hintableSuits = hand.getHintableSuits(for: getFirstCard())
         
         XCTAssertEqual(
             hintableSuits,
@@ -86,9 +87,10 @@ class HandTests: XCTestCase {
 
     func testHintableSuitsWithRainbowsForSuitedCard() {
         useHand(withRainbows: true)
-        let card = getFirstCard()
-        card.setSuits([.green])
-        let hintableSuits = hand.getHintableSuits(for: card)
+        selectFirstCard()
+        hand.applyHint(.suit(.green))
+
+        let hintableSuits = hand.getHintableSuits(for: getFirstCard())
         
         XCTAssertEqual(
             hintableSuits,
@@ -99,9 +101,11 @@ class HandTests: XCTestCase {
     
     func testHintableSuitsWithRainbowsForMultiSuitedCard() {
         useHand(withRainbows: true)
-        let card = getFirstCard()
-        card.setSuits([.green, .blue])
-        let hintableSuits = hand.getHintableSuits(for: card)
+        selectFirstCard()
+        hand.applyHint(.suit(.green))
+        hand.applyHint(.suit(.blue))
+
+        let hintableSuits = hand.getHintableSuits(for: getFirstCard())
         
         XCTAssertTrue(
             hintableSuits.isEmpty,
@@ -112,11 +116,10 @@ class HandTests: XCTestCase {
     func testApplyingSuitHintWithoutRainbows() {
         useHand(withRainbows: false)
         
-        let startCards = Array(hand.cards[0 ... 1])
         hand.selectedCards = [0, 1]
         hand.applyHint(.suit(.red))
         
-        for card in startCards {
+        for card in hand.cards[0 ... 1] {
             let hintableSuits = hand.getHintableSuits(for: card)
             XCTAssertTrue(
                 hintableSuits.isEmpty,
@@ -138,14 +141,13 @@ class HandTests: XCTestCase {
     
     func testApplyingMultipleSuitHintsWithoutRainbows() {
         useHand(withRainbows: false)
-        let card = getFirstCard()
 
         selectFirstCard()
         hand.applyHint(.suit(.blue))
         hand.applyHint(.suit(.green))
 
         XCTAssertEqual(
-            card.hintedSuits,
+            getFirstCard().hintedSuits,
             [.blue],
              .WithoutRainbows.ignoresSubsequentSuitHints
         )
@@ -153,7 +155,6 @@ class HandTests: XCTestCase {
 
     func testApplyingMultipleSuitHintsWithRainbows() {
         useHand(withRainbows: true)
-        let card = getFirstCard()
 
         selectFirstCard()
         hand.applyHint(.suit(.blue))
@@ -161,37 +162,12 @@ class HandTests: XCTestCase {
         hand.applyHint(.suit(.yellow))
 
         XCTAssertEqual(
-            card.hintedSuits,
+            getFirstCard().hintedSuits,
             [.blue, .green],
             .WithRainbows.ignoresSuitHintsAfterSecond
         )
-    }
-
-    func testApplyingSuitHintWithRainbows() {
-        useHand(withRainbows: true)
-
-        // Assume the last card is a rainbow with one suit hinted
-        let lastCard = hand.cards.last!
-        lastCard.setSuits([.green])
-
-        selectFirstCard()
-        hand.applyHint(.suit(.red))
-
-        let startingCards = Array(hand.cards[0 ..< 3])
-
-        for card in startingCards {
-            let hintableSuits = hand.getHintableSuits(for: card)
-            XCTAssertEqual(
-                hintableSuits,
-                Set(Suit.allCases).subtracting([.red]),
-                .WithRainbows.applyingSuitHint
-            )
-        }
-
-        let hintableSuits = hand.getHintableSuits(for: lastCard)
-        XCTAssertEqual(
-            hintableSuits,
-            Set(Suit.allCases).subtracting([.red, .green]),
+        XCTAssertTrue(
+            getFirstCard().hintableSuits.isEmpty,
             .WithRainbows.applyingSuitHint
         )
     }
@@ -209,11 +185,10 @@ class HandTests: XCTestCase {
 
     func testSuitForSuitedCardWithoutRainbows() {
         useHand(withRainbows: false)
-        let firstCard = getFirstCard()
         selectFirstCard()
         hand.applyHint(.suit(.yellow))
 
-        let suit = hand.getSuit(for: firstCard)
+        let suit = hand.getSuit(for: getFirstCard())
 
         XCTAssertEqual(
             suit,
@@ -224,7 +199,6 @@ class HandTests: XCTestCase {
 
     func testSuitForInferredUnsuitedCardWithoutRainbows() {
         useHand(withRainbows: false)
-        let firstCard = getFirstCard()
 
         selectThirdCard()
         hand.applyHint(.suit(.red))
@@ -232,7 +206,7 @@ class HandTests: XCTestCase {
         hand.applyHint(.suit(.yellow))
         hand.applyHint(.suit(.blue))
 
-        let suit = hand.getSuit(for: firstCard)
+        let suit = hand.getSuit(for: getFirstCard())
 
         XCTAssertEqual(
             suit,
@@ -254,12 +228,12 @@ class HandTests: XCTestCase {
 
     func testSuitForUnsuitedCardWithOneHintableSuitWithRainbows() {
         useHand(withRainbows: true)
-        let firstCard = getFirstCard()
+        var firstCard = getFirstCard()
 
-        firstCard.removeHintableSuit(.red)
-        firstCard.removeHintableSuit(.green)
-        firstCard.removeHintableSuit(.yellow)
-        firstCard.removeHintableSuit(.blue)
+        firstCard = firstCard.removingHintableSuit(.red)
+        firstCard = firstCard.removingHintableSuit(.green)
+        firstCard = firstCard.removingHintableSuit(.yellow)
+        firstCard = firstCard.removingHintableSuit(.blue)
 
         let suit = hand.getSuit(for: firstCard)
 
@@ -272,15 +246,15 @@ class HandTests: XCTestCase {
 
     func testSuitForSuitedCardWithOneHintableSuitWithRainbows() {
         useHand(withRainbows: true)
-        let firstCard = getFirstCard()
+        var card = getFirstCard()
 
-        firstCard.hintedSuits = [.green]
+        card.hintedSuits = [.green]
 
-        firstCard.removeHintableSuit(.red)
-        firstCard.removeHintableSuit(.yellow)
-        firstCard.removeHintableSuit(.blue)
+        card = card.removingHintableSuit(.red)
+        card = card.removingHintableSuit(.yellow)
+        card = card.removingHintableSuit(.blue)
 
-        let suit = hand.getSuit(for: firstCard)
+        let suit = hand.getSuit(for: card)
 
         XCTAssertNil(
             suit,
@@ -321,7 +295,6 @@ class HandTests: XCTestCase {
 
     func testSuitForInferredUnsuitedCardWithRainbows() {
         useHand(withRainbows: true)
-        let firstCard = getFirstCard()
 
         selectThirdCard()
         hand.applyHint(.suit(.red))
@@ -329,7 +302,7 @@ class HandTests: XCTestCase {
         hand.applyHint(.suit(.yellow))
         hand.applyHint(.suit(.blue))
 
-        let suit = hand.getSuit(for: firstCard)
+        let suit = hand.getSuit(for: getFirstCard())
 
         XCTAssertEqual(
             suit,
@@ -376,10 +349,17 @@ class HandTests: XCTestCase {
 
     func testHintableValuesWithNarrowedValues() {
         useHand(withRainbows: true)
-        let firstCard = getFirstCard()
-        firstCard.removeHintableValue(.one)
-        firstCard.removeHintableValue(.three)
-
+        
+        selectThirdCard()
+        hand.applyHint(.value(.one))
+        
+        deselectCards()
+        
+        selectLastCard()
+        hand.applyHint(.value(.three))
+        
+        deselectCards()
+   
         selectFirstCard()
         let hintableValues = hand.hintableValues
 
@@ -392,14 +372,12 @@ class HandTests: XCTestCase {
 
     func testApplyingValueHint() {
         useHand(withRainbows: false)
-        let firstCard = getFirstCard()
-        let remainingCards = Array(hand.cards[1 ... 3])
 
         selectFirstCard()
         hand.applyHint(.value(.five))
 
         XCTAssertEqual(
-            firstCard.value,
+            getFirstCard().value,
             .five,
             .applyingValueHint
         )
@@ -410,6 +388,7 @@ class HandTests: XCTestCase {
             .hintableValuesWithValuedCard
         )
 
+        let remainingCards = Array(hand.cards[1 ... 3])
         for card in remainingCards {
             let hintableValues = card.hintableValues
             XCTAssertEqual(
@@ -636,7 +615,7 @@ class HandTests: XCTestCase {
             XCTAssertEqual(card.hintableValues, otherCard.hintableValues)
             XCTAssertEqual(card.hintedSuits, otherCard.hintedSuits)
             XCTAssertEqual(card.value, otherCard.value)
-            XCTAssertNotEqual(card.uuid, otherCard.uuid)
+            XCTAssertEqual(card.uuid, otherCard.uuid)
         }
     }
     
@@ -687,6 +666,14 @@ class HandTests: XCTestCase {
     
     private func selectThirdCard() {
         hand.selectedCards = [2]
+    }
+    
+    private func selectLastCard() {
+        hand.selectedCards = [3]
+    }
+    
+    private func deselectCards() {
+        hand.selectedCards = []
     }
     
     private func getFirstCard() -> Card {
