@@ -1,6 +1,6 @@
 import Foundation
 
-public enum Value: Int, CaseIterable, Comparable {    
+public enum Value: Int, CaseIterable, Comparable, Codable {    
     case one = 1
     case two
     case three

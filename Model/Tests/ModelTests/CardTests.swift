@@ -84,6 +84,13 @@ class CardTests: XCTestCase {
             .removeOutstandingValue
         )
     }
+    
+    func testCodability() throws {
+        let encodedCard = try JSONEncoder().encode(card)
+        let decodedCard = try JSONDecoder().decode(Card.self, from: encodedCard)
+        
+        XCTAssertEqual(card, decodedCard, .isCodable)
+    }
 }
 
 fileprivate extension String {
@@ -95,4 +102,5 @@ fileprivate extension String {
     static let settingValue = "Setting a value should remove all outstanding values"
     static let removeOutstandingSuit = "A card can remove a suit from its outstanding suits"
     static let removeOutstandingValue = "A card can remove a value from its outstanding values"
+    static let isCodable = "A card should be encodable and decodable"
 }

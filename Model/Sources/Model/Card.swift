@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-public struct Card: Equatable, Hashable {
+public struct Card: Equatable, Hashable, Codable {
     public var hintedSuits = Set<Suit>()
     public var hintableSuits = Set(Suit.allCases)
     public var value: Value?

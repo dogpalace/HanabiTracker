@@ -657,7 +657,16 @@ class HandTests: XCTestCase {
             "Hands with differently hinted cards are not equal"
         )
     }
-
+    
+    func testCodability() throws {
+        useHand(withRainbows: true)
+        
+        let encodedHand = try JSONEncoder().encode(hand)
+        let decodedHand = try JSONDecoder().decode(Hand.self, from: encodedHand)
+        
+        XCTAssertEqual(hand, decodedHand, .isCodable)
+    }
+    
     // MARK: - Helpers
     
     private func selectFirstCard() {
@@ -710,6 +719,7 @@ fileprivate extension String {
     static let resettingClearsSelectedCards = "Resetting should clear selected cards"
     static let resettingRecreatesCards = "Resetting should recreate the cards in the hand"
     static let resettingUpdatesHandProperties = "Resetting updates the properties of the hand"
+    static let isCodable = "A hand should be encodable and decodable"
     
     enum WithoutRainbows {
         static let hintableSuitsForSingleSuitedCard = "A single suited card has one hintable suit"

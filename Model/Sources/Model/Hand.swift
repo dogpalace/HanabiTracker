@@ -1,29 +1,55 @@
 import Foundation
 
-public final class Hand: ObservableObject, Equatable {
+public final class Hand: ObservableObject, Equatable, Codable {
     
-    public enum Size: Int, CaseIterable {
+    public enum Size: Int, CaseIterable, Codable {
         case four = 4
         case five = 5
     }
     
     @Published public var cards: [Card]
     @Published public var selectedCards = IndexSet()
-    
+
     public private(set) var allowsRainbows: Bool
     private(set) var size: Size
     
     public init(
         allowsRainbows: Bool,
-        size: Size
+        size: Size,
+        cards: [Card] = []
     ) {
         self.allowsRainbows = allowsRainbows
         self.size = size
         
-        cards = []
-        (0 ..< self.size.rawValue).forEach { _ in
-            cards.append(Card())
+        self.cards = cards
+        if self.cards.isEmpty {
+            (0 ..< self.size.rawValue).forEach { _ in
+                self.cards.append(Card())
+            }
         }
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        allowsRainbows = try container.decode(Bool.self, forKey: .allowsRainbows)
+        size = try container.decode(Size.self, forKey: .size)
+        cards = try container.decode([Card].self, forKey: .cards)
+        selectedCards = try container.decode(IndexSet.self, forKey: .selectedCards)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(allowsRainbows, forKey: .allowsRainbows)
+        try container.encode(size, forKey: .size)
+        try container.encode(cards, forKey: .cards)
+        try container.encode(selectedCards, forKey: .selectedCards)
+    }
+    
+    public enum CodingKeys: CodingKey {
+        case allowsRainbows
+        case size
+        case cards
+        case selectedCards
     }
     
     public func toggleSelection(of card: Card) {

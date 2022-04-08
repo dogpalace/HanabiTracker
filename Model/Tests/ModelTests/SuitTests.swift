@@ -33,4 +33,15 @@ final class SuitTests: XCTestCase {
             "Suits should be in a predictable order"
         )
     }
+    
+    func testCodability() throws {
+        let encodedSuit = try JSONEncoder().encode(Suit.blue)
+        let decodedSuit = try JSONDecoder().decode(Suit.self, from: encodedSuit)
+        
+        XCTAssertEqual(
+            decodedSuit,
+            .blue,
+            "A suit should be encodable and decodable"
+        )
+    }
 }
