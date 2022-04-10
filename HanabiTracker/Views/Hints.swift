@@ -61,6 +61,7 @@ struct Hints_Previews: PreviewProvider {
     struct Preview: View {
         @State private var hand = Hand(
             allowsRainbows: false,
+            allowsBlacks: false,
             size: .four
         )
         @State private var selectedHint: Hint?

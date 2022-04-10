@@ -10,15 +10,18 @@ public final class Hand: ObservableObject, Equatable, Codable {
     @Published public var cards: [Card]
     @Published public var selectedCards = IndexSet()
 
+    public private(set) var allowsBlacks: Bool
     public private(set) var allowsRainbows: Bool
     private(set) var size: Size
     
     public init(
         allowsRainbows: Bool,
+        allowsBlacks: Bool,
         size: Size,
         cards: [Card] = []
     ) {
         self.allowsRainbows = allowsRainbows
+        self.allowsBlacks = allowsBlacks
         self.size = size
         
         self.cards = cards
@@ -31,6 +34,7 @@ public final class Hand: ObservableObject, Equatable, Codable {
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        allowsBlacks = try container.decode(Bool.self, forKey: .allowsBlacks)
         allowsRainbows = try container.decode(Bool.self, forKey: .allowsRainbows)
         size = try container.decode(Size.self, forKey: .size)
         cards = try container.decode([Card].self, forKey: .cards)
@@ -39,6 +43,7 @@ public final class Hand: ObservableObject, Equatable, Codable {
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(allowsBlacks, forKey: .allowsBlacks)
         try container.encode(allowsRainbows, forKey: .allowsRainbows)
         try container.encode(size, forKey: .size)
         try container.encode(cards, forKey: .cards)
@@ -46,6 +51,7 @@ public final class Hand: ObservableObject, Equatable, Codable {
     }
     
     public enum CodingKeys: CodingKey {
+        case allowsBlacks
         case allowsRainbows
         case size
         case cards
@@ -94,7 +100,12 @@ public final class Hand: ObservableObject, Equatable, Codable {
             .sorted()
     }
     
-    public func reset(allowsRainbows: Bool, size: Size) {
+    public func reset(
+        allowsBlacks: Bool,
+        allowsRainbows: Bool,
+        size: Size
+    ) {
+        self.allowsBlacks = allowsBlacks
         self.allowsRainbows = allowsRainbows
         self.size = size
         self.selectedCards = []
@@ -105,18 +116,29 @@ public final class Hand: ObservableObject, Equatable, Codable {
         }
     }
     
+    /*
+     Returns the suit that is either hinted or inferred if the options allow it
+     */
     public func getSuit(for card: Card) -> Suit? {
-        if card.hintedSuits.isEmpty, card.hintableSuits.count == 1 {
-            return getHintableSuits(for: card).first
+        if isUnsuitedWithOneHintableSuit(card) {
+            return allowsBlacks ? nil : getHintableSuits(for: card).first
         }
-        
-        if card.hintedSuits.count == 1, card.hintableSuits.count == 0 {
+        else if isSuitedWithNoHintableSuits(card) {
             return card.hintedSuits.first
         }
-        
-        return allowsRainbows ? nil : card.hintedSuits.first
+        else {
+            return allowsRainbows ? nil : card.hintedSuits.first
+        }
     }
     
+    private func isUnsuitedWithOneHintableSuit(_ card: Card) -> Bool {
+        card.hintedSuits.isEmpty && card.hintableSuits.count == 1
+    }
+    
+    private func isSuitedWithNoHintableSuits(_ card: Card) -> Bool {
+        card.hintedSuits.count == 1 && card.hintableSuits.isEmpty
+    }
+        
     public func getHintableSuits(for card: Card) -> Set<Suit> {
         allowsRainbows
             ? getHintableSuitsWithRainbows(for: card)
@@ -159,6 +181,12 @@ public final class Hand: ObservableObject, Equatable, Codable {
         guard allowsRainbows else { return false }
         
         return card.hintedSuits.count == 2
+    }
+    
+    public func isDefinitelyBlack(_ card: Card) -> Bool {
+        guard allowsBlacks else { return false }
+        
+        return card.hintedSuits.isEmpty && card.hintableSuits.isEmpty
     }
     
     private func applySuitHintWithRainbows(suit: Suit, hintedIndices: IndexSet) {
@@ -222,6 +250,7 @@ public final class Hand: ObservableObject, Equatable, Codable {
         }
         let newHand = Hand(
             allowsRainbows: hand.allowsRainbows,
+            allowsBlacks: hand.allowsBlacks,
             size: hand.size
         )
         newHand.cards = newCards
@@ -237,6 +266,7 @@ public final class Hand: ObservableObject, Equatable, Codable {
     
     public static func ==(lhs: Hand, rhs: Hand) -> Bool {
         return lhs.allowsRainbows == rhs.allowsRainbows
+        && lhs.allowsBlacks == rhs.allowsBlacks
         && lhs.size == rhs.size
         && lhs.cards.enumerated().allSatisfy { pair in
             let card = pair.element

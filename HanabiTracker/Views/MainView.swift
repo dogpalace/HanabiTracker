@@ -12,6 +12,7 @@ struct MainView: View {
         _hand = StateObject(
             wrappedValue: Hand(
                 allowsRainbows: newOptions.allowsRainbows,
+                allowsBlacks: false,
                 size: newOptions.handSize
             )
         )

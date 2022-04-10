@@ -7,6 +7,11 @@ class OptionsTests: XCTestCase {
     
     func testDefaults() {
         XCTAssertEqual(
+            options.allowsBlacks,
+            false,
+            "Should not allow blacks by default"
+        )
+        XCTAssertEqual(
             options.allowsRainbows,
             false,
             "Should not allow rainbows by default"

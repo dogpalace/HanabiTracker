@@ -92,6 +92,7 @@ struct GameView_Previews: PreviewProvider {
     struct Preview: View {
         @StateObject var hand = Hand(
             allowsRainbows: true,
+            allowsBlacks: false,
             size: .four
         )
         @State var gameRecord = GameRecord()

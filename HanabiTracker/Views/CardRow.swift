@@ -29,7 +29,11 @@ struct CardRow_Previews: PreviewProvider {
     }
     
     struct Preview: View {
-        @StateObject var hand = Hand(allowsRainbows: false, size: .five)
+        @StateObject var hand = Hand(
+            allowsRainbows: false,
+            allowsBlacks: false,
+            size: .five
+        )
 
         var body: some View {
             CardRow(hand: hand)
