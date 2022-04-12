@@ -20,15 +20,27 @@ struct GameOptions: View {
         NavigationView {
             VStack {
                 handSizeSelection
-                HStack {
-                    Toggle("Allows 🌈s", isOn: options.allowsRainbows)
-                        .font(.title2)
-                }
+                rainbowsSelection
+                blacksSelection
             }
             .padding()
             .navigationBarItems(trailing: done)
         }
         .padding()
+    }
+    
+    private var rainbowsSelection: some View {
+        HStack {
+            Toggle("Allows 🌈s", isOn: options.allowsRainbows)
+                .font(.title2)
+        }
+    }
+    
+    private var blacksSelection: some View {
+        HStack {
+            Toggle("Allows black cards", isOn: options.allowsBlacks)
+                .font(.title2)
+        }
     }
     
     private var done: some View {

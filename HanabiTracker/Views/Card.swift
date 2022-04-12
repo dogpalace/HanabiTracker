@@ -5,6 +5,7 @@ struct Card: View {
     var card: Model.Card
     var inferredSuit: Suit?
     var hintableSuits: [Suit]
+    let isBlack: Bool
     let isRainbow: Bool
     let isSelected: Bool
     
@@ -57,18 +58,9 @@ struct Card: View {
     
     @ViewBuilder
     private var suitInformation: some View {
-        if isRainbow {
-            ZStack {
-                Color.white
-                Text("🌈")
-                    .font(.largeTitle)
-            }
-            .clipShape(Circle())
-            .padding()
-        }
-        else if let suit = inferredSuit {
-            suitView(for: suit).padding()
-        }
+        if isRainbow { rainbowIndicator }
+        else if isBlack { blackIndicator }
+        else if let suit = inferredSuit { suitView(for: suit).padding() }
         else {
             VStack(spacing: 4) {
                 ForEach(Suit.allCases, id: \.self) { suit in
@@ -77,7 +69,27 @@ struct Card: View {
             }
         }
     }
-
+    
+    private var rainbowIndicator: some View {
+        ZStack {
+            Color.white
+            Text("🌈")
+                .font(.largeTitle)
+        }
+        .clipShape(Circle())
+        .padding()
+    }
+    
+    private var blackIndicator: some View {
+        ZStack {
+            Color.black
+            Image(systemName: "checkmark")
+                .foregroundColor(.white)
+        }
+        .clipShape(Circle())
+        .padding()
+    }
+    
     private func suitView(for suit: Suit) -> some View {
         ZStack {
             ColorSuitMap.backgroundColor(for: suit)
@@ -123,22 +135,25 @@ struct Card_Previews: PreviewProvider {
         )
             .colorScheme(.dark)
             .previewLayout(.sizeThatFits)
-
+        
     }
     
     struct Preview: View {
         var card = Model.Card(hintableValues: [.three, .four])
         var hintableSuits = [Suit]()
         var hintableValues = Value.allCases
+        let isBlack: Bool
         let isRainbow: Bool
         
         init(
             hintableSuits: [Suit] = [],
             hintableValues: [Value] = Value.allCases,
+            isBlack: Bool = false,
             isRainbow: Bool
         ) {
             self.hintableSuits = hintableSuits
             self.hintableValues = hintableValues
+            self.isBlack = isBlack
             self.isRainbow = isRainbow
             
             card = Model.Card(hintableValues: Set(hintableValues))
@@ -148,6 +163,7 @@ struct Card_Previews: PreviewProvider {
             Card(
                 card: card,
                 hintableSuits: hintableSuits,
+                isBlack: isBlack,
                 isRainbow: isRainbow,
                 isSelected: false
             )

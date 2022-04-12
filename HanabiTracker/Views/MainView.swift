@@ -27,6 +27,7 @@ struct MainView: View {
             .onChange(of: options) {
                 gameRecord.hands = []
                 hand.reset(
+                    allowsBlacks: $0.allowsBlacks,
                     allowsRainbows: $0.allowsRainbows,
                     size: $0.handSize
                 )

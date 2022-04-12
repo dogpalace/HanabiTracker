@@ -11,6 +11,7 @@ struct CardRow: View {
                     card: card,
                     inferredSuit: hand.getSuit(for: card),
                     hintableSuits: Array(hand.getHintableSuits(for: card)),
+                    isBlack: hand.isDefinitelyBlack(card),
                     isRainbow: hand.isDefinitelyRainbow(card),
                     isSelected: hand.isCardSelected(card)
                 )
