@@ -21,5 +21,9 @@ class OptionsTests: XCTestCase {
             .four,
             "Should have a default hand size of four"
         )
+        XCTAssertTrue(
+            options.showsConventions,
+            "Should show conventions by default"
+        )
     }
 }
