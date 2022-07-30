@@ -4,9 +4,28 @@ import Model
 struct CurrentHand: View {
     @EnvironmentObject var hand: Hand
     @Environment(\.options) private var options: Binding<Options>
+    @AppStorage("showsConventions") private var showsConventions = true
     
     var body: some View {
-        CardRow(hand: hand).padding()
+        VStack {
+            CardRow(hand: hand)
+            playOrderConvention
+        }
+        .padding()
+    }
+    
+    var playOrderConvention: some View {
+        Group {
+            if showsConventions {
+                Spacer()
+                HStack {
+                    Text("Old")
+                    Spacer()
+                    Text("New")
+                }
+                .font(.title2)
+            }
+        }
     }
 }
 

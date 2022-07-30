@@ -22,6 +22,7 @@ struct GameOptions: View {
                 handSizeSelection
                 rainbowsSelection
                 blacksSelection
+                showsConventionsSelection
             }
             .padding()
             .navigationBarItems(trailing: done)
@@ -40,6 +41,15 @@ struct GameOptions: View {
         HStack {
             Toggle("Allows black cards", isOn: options.allowsBlacks)
                 .font(.title2)
+        }
+    }
+    
+    private var showsConventionsSelection: some View {
+        HStack {
+            Toggle(
+                "Show play order convention",
+                isOn: options.showsConventions)
+            .font(.title2)
         }
     }
     
