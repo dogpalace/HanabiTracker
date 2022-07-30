@@ -40,6 +40,9 @@ struct MainView: View {
                 gameRecord.hands.append(Hand.createDeepCopy(of: hand))
             }
             .onAppear {
+                // Keep screen awake
+                UIApplication.shared.isIdleTimerDisabled = true
+                
                 // Offer to restore a persisted hand if one is available
                 isShowingStateRestorationAlert = gameRecord.hands.count > 1
                 
