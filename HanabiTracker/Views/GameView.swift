@@ -43,7 +43,7 @@ struct GameView: View {
     
     @ViewBuilder
     private var hintSheetButton: some View {
-        Button("Hints") {
+        Button("Hint") {
             isPresentingHintSheet = true
         }
         .font(.title)
